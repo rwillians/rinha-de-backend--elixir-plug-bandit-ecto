@@ -7,6 +7,13 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 - [Plug](https://github.com/elixir-plug/plug) (middleware stack).
 
 
+## TODO
+
+- [x] rota para adicionar pessoa
+- [ ] rota para listar pessoas (paginado)
+- [x] rota para pegar pessoa 👀 por id
+
+
 ## Como rodar
 
 ### Docker
