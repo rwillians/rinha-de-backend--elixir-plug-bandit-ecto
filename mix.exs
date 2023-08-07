@@ -29,7 +29,8 @@ defmodule Rinha.MixProject do
       {:jason, "~> 1.4.1"},
       {:plug, "~> 1.14.2"},
       {:plug_cowboy, "~> 2.6.1"},
-      {:postgrex, ">= 0.17.2"}
+      {:postgrex, ">= 0.17.2"},
+      {:tapex, github: "rwillians/tapex", ref: "46900d4", only: :test}
     ]
   end
 

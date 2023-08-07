@@ -47,7 +47,23 @@ mix server
 ```
 
 
-## Rotas
+## Testes
 
-> **Note**
-> WIP
+```txt
+TAP version 13
+ok       1 test GET /pessoas/:id :: 404 :: quando não existe pessoa com o dado id (Elixir.PegarPessoaTest)
+ok       2 test GET /pessoas/:id :: 200 :: quando existe pessoa com o dado id (Elixir.PegarPessoaTest)
+ok       3 Elixir.PegarPessoaTest
+ok       4 test POST /pessoas :: 201 :: quando todos campos são válidos (stack null) (Elixir.CriarPessoaTest)
+ok       5 test POST /pessoas :: 422 :: quando campo `nome` está vazio (Elixir.CriarPessoaTest)
+ok       6 test POST /pessoas :: 422 :: quando `apelido` já existe (Elixir.CriarPessoaTest)
+ok       7 test POST /pessoas :: 422 :: quando campo `nome` excede limite de caracteres (Elixir.CriarPessoaTest)
+ok       8 test POST /pessoas :: 422 :: quando campo `apelido` está vazio (Elixir.CriarPessoaTest)
+ok       9 test POST /pessoas :: 422 :: quando campo `apelido` excede limite de caracteres (Elixir.CriarPessoaTest)
+ok      10 test POST /pessoas :: 422 :: quando nenhum campo é informado (Elixir.CriarPessoaTest)
+ok      11 test POST /pessoas :: 201 :: quando todos campos são válidos (Elixir.CriarPessoaTest)
+ok      12 test POST /pessoas :: 422 :: quando campo `dataNascimento` está vazio (Elixir.CriarPessoaTest)
+ok      13 test POST /pessoas :: 422 :: quando campo `stack` possui elemento que excede limite de caracteres (Elixir.CriarPessoaTest)
+ok      14 test POST /pessoas :: 422 :: quando campo `dataNascimento` term formato invalido (Elixir.CriarPessoaTest)
+ok      15 test POST /pessoas :: 422 :: quando campo `nome` tem caracteres especiais (Elixir.CriarPessoaTest)
+```
