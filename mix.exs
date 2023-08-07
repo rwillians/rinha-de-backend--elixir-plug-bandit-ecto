@@ -23,7 +23,12 @@ defmodule Rinha.MixProject do
 
   defp deps do
     [
+      {:corsica, "~> 2.1.2"},
       {:ecto_sql, "~> 3.10.1"},
+      {:etag_plug, "~> 1.0.0"},
+      {:jason, "~> 1.4.1"},
+      {:plug, "~> 1.14.2"},
+      {:plug_cowboy, "~> 2.6.1"},
       {:postgrex, ">= 0.17.2"}
     ]
   end

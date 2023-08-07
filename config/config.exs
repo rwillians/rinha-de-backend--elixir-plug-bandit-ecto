@@ -29,6 +29,7 @@ import Config
 
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id],
   backends: [:console]
 
 #
@@ -36,6 +37,15 @@ config :logger, :console,
 #
 
 config :rinha, ecto_repos: [Rinha.Repo]
+
+#
+# SERVIDOR HTTP DA APLICAÇÃO
+#
+
+# Define se o servidor HTTP deve ser iniciado automaticamente ao iniciar a
+# aplicação. Desabilitador por padrão, utilize o comando `mix server` para
+# iniciar a aplicação juntamente com o servidor HTTP.
+config :rinha, RinhaAPI.Endpoint, run_server?: false
 
 #
 # CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
