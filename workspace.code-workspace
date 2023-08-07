@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "./",
+      "name": "rinha-backend"
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "EditorConfig.EditorConfig",
+      "JakeBecker.elixir-ls"
+    ]
+  },
+  "settings": {
+    "emmet.includeLanguages": {
+      "html-eex": "html"
+    }
+  }
+}
+

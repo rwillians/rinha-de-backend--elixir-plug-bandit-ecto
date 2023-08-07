@@ -1,0 +1,12 @@
+/.elixir_ls/
+/_build/
+.fetch/
+/cover/
+/deps/
+/tmp/
+/doc/
+*.ez
+.envrc
+.DS_Store
+rinha-*.tar
+erl_crash.dump
