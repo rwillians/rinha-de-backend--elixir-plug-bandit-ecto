@@ -32,6 +32,12 @@ config :logger, :console,
   backends: [:console]
 
 #
+# ECTO
+#
+
+config :rinha, ecto_repos: [Rinha.Repo]
+
+#
 # CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
 #
 #   Essas configurações serão importadas de seus respecitivos arquivos e podem

@@ -22,7 +22,10 @@ defmodule Rinha.MixProject do
   end
 
   defp deps do
-    []
+    [
+      {:ecto_sql, "~> 3.10.1"},
+      {:postgrex, ">= 0.17.2"}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
