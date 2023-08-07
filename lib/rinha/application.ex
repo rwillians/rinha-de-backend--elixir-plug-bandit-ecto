@@ -19,7 +19,7 @@ defmodule Rinha.Application do
   end
 
   defp http_server_children(opts) do
-    config = RinhaAPI.Endpoint.config(opts)
+    config = RinhaAPI.Endpoint.get_config(opts)
 
     port = Keyword.fetch!(config, :port)
     run_server? = Keyword.fetch!(config, :run_server?)

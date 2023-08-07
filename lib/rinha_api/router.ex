@@ -12,6 +12,13 @@ defmodule RinhaAPI.Router do
       send_resp_json: 2
     ]
 
+  import RinhaAPI.Controller.Pessoas,
+    only: [
+      criar_pessoa: 1,
+      listar_pessoas: 1,
+      pegar_pessoa: 1
+    ]
+
   plug :match
   plug :dispatch
 
@@ -22,6 +29,10 @@ defmodule RinhaAPI.Router do
     |> put_resp_content_type("text/plain")
     |> send_resp(200, "pong!")
   end
+
+  get  "/pessoas", do: listar_pessoas(conn)
+  post "/pessoas", do: criar_pessoa(conn)
+  get  "/pessoas/:id", do: pegar_pessoa(conn)
 
   # endregion
 

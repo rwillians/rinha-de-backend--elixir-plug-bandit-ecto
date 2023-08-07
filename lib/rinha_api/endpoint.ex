@@ -45,16 +45,30 @@ defmodule RinhaAPI.Endpoint do
   Retorna configurações da API com a possibilidade de sobrescrever
   configurações passando uma keyword list como argument para `config/1`.
   """
-  @spec config(overrides :: [option]) :: [
+  @spec get_config(opts :: [option]) :: [
           port: pos_integer,
           run_server?: boolean
         ]
 
-  def config(overrides \\ []) do
+  def get_config(opts \\ []) do
     Application.fetch_env!(:rinha, RinhaAPI.Endpoint)
-    |> Keyword.merge(overrides)
+    |> Keyword.merge(opts)
     |> Keyword.take([:port, :run_server?])
     |> Keyword.put_new(:port, 3000)
     |> Keyword.put_new(:run_server?, false)
+  end
+
+  @doc """
+  Altera configurações de tempo de execução referentes à API.
+  """
+  @spec put_config(opts :: [option]) :: :ok
+
+  def put_config(opts) do
+    updated_config =
+      Application.fetch_env!(:rinha, RinhaAPI.Endpoint)
+      |> Keyword.merge(opts)
+      |> Keyword.take([:port, :run_server?])
+
+    Application.put_env(:rinha, RinhaAPI.Endpoint, updated_config)
   end
 end

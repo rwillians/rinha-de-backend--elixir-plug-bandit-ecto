@@ -4,7 +4,17 @@ defmodule Rinha.Pessoa do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Ecto.Query
   import Ex.Ecto.Changeset
+
+  @typedoc false
+  @type t :: %Rinha.Pessoa{
+          id: Ecto.UUID.t(),
+          nome: String.t(),
+          apelido: String.t(),
+          data_nascimento: Date.t(),
+          stack: [String.t(), ...] | nil
+        }
 
   @primary_key false
   @derive {Jason.Encoder, only: [:id, :nome, :apelido, :data_nascimento, :stack]}
@@ -22,6 +32,12 @@ defmodule Rinha.Pessoa do
   @min_char_error_msg "deve conter no mínimo %{count} caracteres"
   @max_char_error_msg "deve conter no máximo %{count} caracteres"
 
+  @doc """
+  Returna um `Ecto.Changeset` com as alterações feitas em um model
+  `Rinha.Pessoa`.
+  """
+  @spec changeset(t(), map) :: Ecto.Changeset.t()
+
   def changeset(pessoa, params \\ %{}) do
     pessoa
     |> cast(params, [:nome, :apelido, :data_nascimento, :stack])
@@ -33,4 +49,13 @@ defmodule Rinha.Pessoa do
     |> unique_constraint(:apelido, message: @dup_nick_error_msg)
     |> validate_each(:stack, validate_length(max: 10, message: @max_char_error_msg))
   end
+
+  @doc """
+  Query builder para o model `Rinha.Pessoa`.
+  """
+  @spec query([{atom, term}, ...]) :: Ecto.Queryable.t()
+  def query([_ | _] = filters), do: query(__MODULE__, filters)
+
+  defp query(query, []), do: query
+  defp query(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> query(tail)
 end
