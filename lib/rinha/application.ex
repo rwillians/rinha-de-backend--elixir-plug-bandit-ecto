@@ -7,8 +7,11 @@ defmodule Rinha.Application do
 
   @impl true
   def start(_type, opts) do
+    topologies = Application.get_env(:libcluster, :topologies)
+
     children =
       List.flatten([
+        {Cluster.Supervisor, [topologies, [name: Rinha.ClusterSupervisor]]},
         Rinha.Repo,
         RinhaAPI.Endpoint.children_spec(opts)
         #                 ^ Gambiarra por que não quero que o servidor HTTP

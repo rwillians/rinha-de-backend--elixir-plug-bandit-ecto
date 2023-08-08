@@ -11,13 +11,11 @@ import Config
 # LOGGER
 #
 
-config :logger, level: :warning
-config :logger, compile_time_purge_matching: [[level_lower_than: :warning]]
+config :logger, level: :info
+config :logger, compile_time_purge_matching: [[level_lower_than: :info]]
 
 #
 # ECTO
 #
 
-config :rinha, Rinha.Repo,
-  force: false,
-  ssl: true
+config :rinha, Rinha.Repo, force: false

@@ -48,6 +48,13 @@ config :rinha, ecto_repos: [Rinha.Repo]
 config :rinha, RinhaAPI.Endpoint, run_server?: false
 
 #
+# LIBCLUSTER
+#
+
+config :libcluster, debug: true
+config :libcluster, :topologies, default: [strategy: Cluster.Strategy.Gossip]
+
+#
 # CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
 #
 #   Essas configurações serão importadas de seus respecitivos arquivos e podem
