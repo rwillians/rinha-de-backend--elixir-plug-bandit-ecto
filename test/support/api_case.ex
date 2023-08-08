@@ -29,10 +29,10 @@ defmodule APICase do
   """
   @spec send_req(Plug.Conn.t()) :: Plug.Conn.t()
 
-  @opts RinhaAPI.Router.init([])
+  @opts RinhaAPI.Endpoint.init([])
 
   def send_req(conn) do
-    conn = RinhaAPI.Router.call(conn, @opts)
+    conn = RinhaAPI.Endpoint.call(conn, @opts)
 
     case get_resp_header(conn, "content-type") do
       ["application/json" <> _] ->

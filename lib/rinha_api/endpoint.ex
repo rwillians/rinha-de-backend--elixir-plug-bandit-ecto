@@ -4,6 +4,20 @@ defmodule RinhaAPI.Endpoint do
   require Logger
 
   use Plug.Router, init_mode: :compile
+  use Plug.ErrorHandler
+
+  import RinhaAPI.Controller,
+    only: [
+      http_error: 1,
+      send_resp_json: 2
+    ]
+
+  import RinhaAPI.Controller.Pessoas,
+    only: [
+      criar_pessoa: 1,
+      listar_pessoas: 1,
+      pegar_pessoa: 1
+    ]
 
   plug Plug.RequestId, http_header: "x-request-id"
   plug Plug.Logger
@@ -18,6 +32,11 @@ defmodule RinhaAPI.Endpoint do
     expose_headers: ["x-request-id"],
     max_age: 600
 
+  plug ETag.Plug,
+    generator: ETag.Generator.SHA1Base64,
+    methods: ["GET", "HEAD"],
+    status_codes: [200, 201, 304]
+
   plug Plug.Static,
     at: "/",
     from: {:rinha, "priv/static"}
@@ -26,17 +45,84 @@ defmodule RinhaAPI.Endpoint do
     parsers: [:urlencoded, :json],
     json_decoder: Jason
 
-  plug ETag.Plug,
-    generator: ETag.Generator.SHA1Base64,
-    methods: ["GET", "HEAD"],
-    status_codes: [200, 201, 304]
-
   plug :match
   plug :dispatch
 
-  forward "/", to: RinhaAPI.Router
+  get "/ping" do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "pong!")
+  end
+
+  # region: rotas da aplicação
+
+  get  "/pessoas", do: listar_pessoas(conn)
+  post "/pessoas", do: criar_pessoa(conn)
+  get  "/pessoas/:id", do: pegar_pessoa(conn)
+
+  # endregion
+
+  match _ do
+    Logger.warning("#{conn.method} #{conn.request_path} :: unknown resource requested")
+
+    http_error(:not_found)
+    |> send_resp_json(conn)
+  end
+
+  @impl Plug.ErrorHandler
+  def handle_errors(conn, %{kind: :error, reason: %Plug.Parsers.ParseError{}}) do
+    http_error(:bad_request)
+    |> send_resp_json(conn)
+  end
+
+  def handle_errors(conn, _) do
+    http_error(:internal_server_error)
+    |> send_resp_json(conn)
+  end
 
   #
+  # CONFIG
+  #
+
+  @doc """
+  Returna lista de aplicações filhas necessárias para rodar o servidor HTTP.
+
+  Caso a opção `:run_server?` seja passada como `false`, a lista será retornada
+  vazia pois não haverá necessidade de rodar o servidor.
+
+  ## Exemplos
+
+    ```elixir
+    opts = [port: 3000, run_server?: true]
+
+    children =
+      List.flatten([
+        Rinha.Repo,
+        RinhaAPI.Endpoint.children_spec(opts)
+      ])
+
+    Supervisor.start_link(children, strategy: :one_for_one)
+    ```
+  """
+  @spec children_spec([option]) :: [Supervisor.child_spec()]
+
+  def children_spec(opts \\ []) do
+    config = RinhaAPI.Endpoint.get_config(opts)
+
+    port = Keyword.fetch!(config, :port)
+    run_server? = Keyword.fetch!(config, :run_server?)
+
+    opts = [
+      plug: RinhaAPI.Endpoint,
+      scheme: :http,
+      options: [port: port]
+    ]
+
+    case run_server? do
+      true -> [Plug.Cowboy.child_spec(opts)]
+      false -> []
+    end
+  end
 
   @typedoc false
   @type option :: {:port, pos_integer} | {:run_server?, boolean}
