@@ -3,10 +3,8 @@ defmodule RinhaAPI.Controller.Pessoas do
 
   use RinhaAPI.Controller
 
-  import Rinha.Pessoa, only: [query: 1]
+  import Pessoa, only: [query: 1]
   import Rinha.Repo, only: [one: 1]
-
-  alias Rinha.Pessoa
 
   @doc """
   Endpoint para criação de uma nova pessoa :eyes:

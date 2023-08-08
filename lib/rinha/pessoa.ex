@@ -1,4 +1,4 @@
-defmodule Rinha.Pessoa do
+defmodule Pessoa do
   @moduledoc false
 
   use Ecto.Schema
@@ -8,7 +8,7 @@ defmodule Rinha.Pessoa do
   import Ex.Ecto.Changeset
 
   @typedoc false
-  @type t :: %Rinha.Pessoa{
+  @type t :: %Pessoa{
           id: Ecto.UUID.t(),
           nome: String.t(),
           apelido: String.t(),
@@ -27,16 +27,17 @@ defmodule Rinha.Pessoa do
   end
 
   @required_error_msg "campo obrigatório"
+
+  @doc """
+  Returna um `Ecto.Changeset` com as alterações feitas em um model
+  `Pessoa`.
+  """
+  @spec changeset(t(), map) :: Ecto.Changeset.t()
+
   @dup_nick_error_msg "já existe uma pessoa com esse apelido"
   @alphabet_error_msg "apenas letras e espaços são permitidos"
   @min_char_error_msg "deve conter no mínimo %{count} caracteres"
   @max_char_error_msg "deve conter no máximo %{count} caracteres"
-
-  @doc """
-  Returna um `Ecto.Changeset` com as alterações feitas em um model
-  `Rinha.Pessoa`.
-  """
-  @spec changeset(t(), map) :: Ecto.Changeset.t()
 
   def changeset(pessoa, params \\ %{}) do
     pessoa
@@ -51,7 +52,7 @@ defmodule Rinha.Pessoa do
   end
 
   @doc """
-  Query builder para o model `Rinha.Pessoa`.
+  Query builder para o model `Pessoa`.
   """
   @spec query([{atom, term}, ...]) :: Ecto.Queryable.t()
   def query([_ | _] = filters), do: query(__MODULE__, filters)
