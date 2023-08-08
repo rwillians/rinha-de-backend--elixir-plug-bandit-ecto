@@ -16,15 +16,22 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 
 ## Como rodar
 
-### Docker
-
-> **Note**
-> WIP
-
 ### Docker compose
 
-> **Note**
-> WIP
+A imagem OCI já está compilada e está disponível publicamente (vide endereço em `"docker-compose.yaml"`).
+O `"docker-compose.yaml"`já está configurado com limites de recursos os quais podem ser utilizados da máquina hospedeira (4 cores de CPU e 4GB de memória RAM, ao todo) e também define a quantidade de replicas para cada serviço.
+
+Portanto, a unica coisa que você precisa fazer é rodar up:
+
+```sh
+docker compose up
+```
+
+Por padrão, o load balancer será exposto na porta `8080`. Essa configuração poderá ser alterado definindo a variável de ambiente `LB_PORT` com o número da porta desejada. Por exemplo:
+
+```sh
+LB_PORT=8888 docker compose up
+```
 
 ### Local
 

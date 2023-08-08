@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15.3-alpine3.18
+    environment:
+      - 'POSTGRES_DB=rinha_dev'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'PGDATA=/data/pgdata'
+      - 'LANG=en_US.utf8'
+    volumes:
+      - '${PGDATA:-.docker/postgres/}:/data'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '1.50'
+          memory: 1024M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+
+  api:
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${APP_VERSION:-latest}
+    depends_on:
+      - postgres
+    environment:
+      - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
+      - 'RELEASE_COOKIE=foobar'
+      - 'RELEASE_DISTRIBUTION=sname'
+      - 'SERVER_ENABLED=true'
+    entrypoint: [ "sh", "-c" ]
+    ##
+    #           ↓ Demora alguns segundos para o banco de dados ficar
+    #           ↓ disponível então precisamos esperar para que seja possível
+    #           ↓ rodar `mix ecto.setup`. Esse script irá criar o banco (se
+    #           ↓ ainda não existir) e executará migrações pendentes (se houver
+    #           ↓ alguma).
+    command: [ 'wait-for-it "postgres:5432" && mix ecto.setup && _build/prod/rel/rinha/bin/rinha start' ]
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.50'
+          memory: 768M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+
+  nginx:
+    image: nginx:1.25.1-alpine3.17-slim
+    volumes:
+      - '.docker/nginx/conf.d/:/etc/nginx/conf.d/:ro'
+    depends_on:
+      - api
+    ports:
+      - '${LB_PORT:-8080}:8080'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s

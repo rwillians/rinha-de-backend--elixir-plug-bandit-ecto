@@ -1,0 +1,4 @@
+#! /bin/sh
+
+echo "ping -4 -c 3 -s 8 -i 1 -W 5 -t 15 -q ${1}"
+ping -4 -c 3 -s 8 -i 1 -W 5 -t 15 -q ${1}
