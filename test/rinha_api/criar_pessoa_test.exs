@@ -25,7 +25,7 @@ defmodule CriarPessoaTest do
       assert conn.body_params["stack"] == @fixture.stack
 
       # foi persistido corretamente no banco
-      pessoa = Rinha.Repo.get(Rinha.Pessoa, id)
+      pessoa = Rinha.Repo.get(Pessoa, id)
 
       assert not is_nil pessoa
       assert pessoa.nome == @fixture.nome
@@ -43,7 +43,7 @@ defmodule CriarPessoaTest do
       assert "/pessoas/" <> id = location
       assert id !== ""
 
-      pessoa = Rinha.Repo.get(Rinha.Pessoa, id)
+      pessoa = Rinha.Repo.get(Pessoa, id)
 
       assert not is_nil pessoa
       assert pessoa.stack == nil

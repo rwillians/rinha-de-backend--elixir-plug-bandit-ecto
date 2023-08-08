@@ -3,7 +3,7 @@ defmodule RinhaAPI.Controller.Pessoas do
 
   use RinhaAPI.Controller
 
-  import Pessoa, only: [query: 1]
+  import Pessoa, only: [pessoas_query: 1]
   import Rinha.Repo, only: [one: 1]
 
   @doc """
@@ -54,7 +54,7 @@ defmodule RinhaAPI.Controller.Pessoas do
         } = conn
       ) do
     maybe_pessoa =
-      query(id: id)
+      pessoas_query(id: id)
       |> one()
 
     case maybe_pessoa do

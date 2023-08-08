@@ -54,9 +54,10 @@ defmodule Pessoa do
   @doc """
   Query builder para o model `Pessoa`.
   """
-  @spec query([{atom, term}, ...]) :: Ecto.Queryable.t()
-  def query([_ | _] = filters), do: query(__MODULE__, filters)
+  @spec pessoas_query([{atom, term}, ...]) :: Ecto.Queryable.t()
 
-  defp query(query, []), do: query
-  defp query(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> query(tail)
+  def pessoas_query([_ | _] = filters), do: filter(__MODULE__, filters)
+
+  defp filter(query, []), do: query
+  defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 end
