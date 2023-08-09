@@ -1,5 +1,14 @@
 version: '3.8'
 
+# Limite de recursos: 7cpu, 5GB RAM
+#                     ↳ não compensa escalar a api horizontal antes de escalar
+#                       vertical, então estou colocando 2cpu para cada instância
+#                       (2 instâncias de 2 cpu = 4 cpu)
+#                     ↳ para o banco conseguir acompanhar as instâncias achei
+#                       por bem alocar 2 cpu para ele
+#                     ↳ pro nginx conseguir acompanhar as instâncias da api,
+#                       achei melhor alocar 1cpu.
+
 services:
   postgres:
     image: postgres:15.3-alpine3.18
@@ -15,8 +24,8 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '1.50'
-          memory: 1024M
+          cpus: '2.00'
+          memory: 2048M
         reservations:
           cpus: '0.10'
           memory: 128M
@@ -48,8 +57,8 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: '1.50'
-          memory: 768M
+          cpus: '2.00'
+          memory: 1024M
         reservations:
           cpus: '0.10'
           memory: 128M
@@ -71,8 +80,8 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.50'
-          memory: 256M
+          cpus: '1.00'
+          memory: 1024M
         reservations:
           cpus: '0.10'
           memory: 64M

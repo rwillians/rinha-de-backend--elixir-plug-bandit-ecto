@@ -24,7 +24,7 @@
 import Config
 
 #
-# LOGGER
+#   LOGGER
 #
 
 config :logger, :console,
@@ -33,32 +33,34 @@ config :logger, :console,
   backends: [:console]
 
 #
-# ECTO
+#   ECTO
 #
 
 config :rinha, ecto_repos: [Rinha.Repo]
 
 #
-# SERVIDOR HTTP DA APLICAÇÃO
+#   SERVIDOR HTTP DA APLICAÇÃO
 #
 
-# Define se o servidor HTTP deve ser iniciado automaticamente ao iniciar a
-# aplicação. Desabilitador por padrão, utilize o comando `mix server` para
-# iniciar a aplicação juntamente com o servidor HTTP.
+#   Define se o servidor HTTP deve ser iniciado automaticamente ao iniciar a
+#   aplicação. Desabilitador por padrão, utilize o comando `mix server` para
+#   iniciar a aplicação juntamente com o servidor HTTP.
 config :rinha, RinhaAPI.Endpoint, run_server?: false
 
 #
-# LIBCLUSTER
+#   LIBCLUSTER
 #
 
 config :libcluster, debug: true
-config :libcluster, :topologies, default: [strategy: Cluster.Strategy.Gossip]
 
 #
-# CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
+#   CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
+#   --------------------------------------
 #
 #   Essas configurações serão importadas de seus respecitivos arquivos e podem
-#   sobrescrever configurações definidas nesse arquivo.
+#   sobrescrever configurações definidas nesse arquivo. Os ambientes "dev" e
+#   "test" são considerados ambientes locais; logo, demais ambiente são
+#   considerados "remotos".
 #
 
 case config_env() do

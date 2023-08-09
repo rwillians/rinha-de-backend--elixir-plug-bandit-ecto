@@ -14,10 +14,10 @@ import Config
 import Ex.Config
 
 #
-# ECTO
+#   ECTO
 #
 
-if is_remote?(config_env()) or not is_nil(env("DATABASE_URL")) do
+if is_remote?(config_env()) do
   database_url =
     env("DATABASE_URL") ||
       raise """
@@ -41,7 +41,7 @@ if is_remote?(config_env()) or not is_nil(env("DATABASE_URL")) do
 end
 
 #
-# SERVIDOR HTTP DA APLICAÇÃO
+#   SERVIDOR HTTP DA APLICAÇÃO
 #
 
 config :rinha, RinhaAPI.Endpoint,

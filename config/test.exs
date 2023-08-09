@@ -1,14 +1,14 @@
 ##
 #
-# CONFIGURAÇÕES DE TEMPO DE COMPILAÇÃO
-# Específicas para o ambiente de "test".
+#   CONFIGURAÇÕES DE TEMPO DE COMPILAÇÃO
+#   Específicas para o ambiente de "test".
 #
 ##
 
 import Config
 
 #
-# LOGGER
+#   LOGGER
 #
 
 config :logger,
@@ -16,7 +16,7 @@ config :logger,
   truncate: :infinity
 
 #
-# ECTO
+#   ECTO
 #
 
 database_url =
