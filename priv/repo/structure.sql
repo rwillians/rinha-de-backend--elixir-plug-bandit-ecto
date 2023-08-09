@@ -16,6 +16,20 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -64,6 +78,13 @@ ALTER TABLE ONLY public.schema_migrations
 --
 
 CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido);
+
+
+--
+-- Name: pessoas_nome_apelido_stack_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pessoas_nome_apelido_stack_index ON public.pessoas USING btree (nome, apelido, stack);
 
 
 --

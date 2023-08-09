@@ -11,5 +11,15 @@ defmodule Rinha.Repo.Migrations.InitDatabase do
     end
 
     create unique_index(:pessoas, [:apelido])
+    create index(:pessoas, [:nome, :apelido, :stack])
+    #                       ^ resultados de pesquisa por termo `q`.
+
+    execute """
+    CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+    """
+
+    execute """
+    COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+    """
   end
 end

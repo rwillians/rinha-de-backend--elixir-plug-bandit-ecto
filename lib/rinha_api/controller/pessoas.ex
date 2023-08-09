@@ -3,6 +3,9 @@ defmodule RinhaAPI.Controller.Pessoas do
 
   use RinhaAPI.Controller
 
+  import Ex.Ecto.Query, only: [paginated: 2]
+  import Ex.Map, only: [atomize_keys: 1]
+  import Map, only: [take: 2]
   import Pessoa, only: [pessoas_query: 1]
   import Rinha.Repo, only: [one: 1]
 
@@ -24,15 +27,25 @@ defmodule RinhaAPI.Controller.Pessoas do
     end
   end
 
+  @doc """
+  Lista de forma paginada todas a pessoas existentes no banco de dados. Aceita
+  os seguintes filtros:
+
+  - `pagina` (integer, opcional): o número da página a ser retornada
+    (zero-based -- default `0`);
+  - `limite` (integer, opcional): o número máximo de resultados a ser retornado
+    na página (zero-based -- default `10`);
+  - `q` (string, opcional): um termo de pesquisa o qual será à ambos nome e
+    apelido em `Pessoa`.
+
+  """
   def listar_pessoas(%Plug.Conn{} = conn) do
-    conn
-    |> send_resp_json(200, %{
-      qtd: 0,
-      pagina: 0,
-      anterior: nil,
-      proxima: nil,
-      resultados: []
-    })
+    page =
+      atomize_keys(conn.query_params)
+      |> take([:pagina, :limite, :q])
+      |> paginated(&pessoas_query/1)
+
+    send_resp_json(conn, 200, page)
   end
 
   @doc """

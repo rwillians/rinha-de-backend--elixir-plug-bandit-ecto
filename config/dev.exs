@@ -25,4 +25,4 @@ database_url =
 
 config :rinha, Rinha.Repo,
   url: database_url,
-  force: true
+  force_drop: true

@@ -9,9 +9,11 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 
 ## TODO
 
-- [x] rota para adicionar pessoa
-- [ ] rota para listar pessoas (paginado)
-- [x] rota para pegar pessoa 👀 por id
+- [x] rota para adicionar pessoa;
+- [x] rota para listar pessoas (paginado);
+- [x] rota para pegar pessoa 👀 por id;
+- [x] docker compose;
+- [ ] pipelines para publicar imagens OCI atualizadas quando fizer merge para branch `main`.
 
 
 ## Como rodar
@@ -61,23 +63,39 @@ mix server
 ```
 
 
-## Testes
+## Testes de contrato
 
 ```txt
-TAP version 13
-ok       1 test GET /pessoas/:id :: 404 :: quando não existe pessoa com o dado id (Elixir.PegarPessoaTest)
-ok       2 test GET /pessoas/:id :: 200 :: quando existe pessoa com o dado id (Elixir.PegarPessoaTest)
-ok       3 Elixir.PegarPessoaTest
-ok       4 test POST /pessoas :: 201 :: quando todos campos são válidos (stack null) (Elixir.CriarPessoaTest)
-ok       5 test POST /pessoas :: 422 :: quando campo `nome` está vazio (Elixir.CriarPessoaTest)
-ok       6 test POST /pessoas :: 422 :: quando `apelido` já existe (Elixir.CriarPessoaTest)
-ok       7 test POST /pessoas :: 422 :: quando campo `nome` excede limite de caracteres (Elixir.CriarPessoaTest)
-ok       8 test POST /pessoas :: 422 :: quando campo `apelido` está vazio (Elixir.CriarPessoaTest)
-ok       9 test POST /pessoas :: 422 :: quando campo `apelido` excede limite de caracteres (Elixir.CriarPessoaTest)
-ok      10 test POST /pessoas :: 422 :: quando nenhum campo é informado (Elixir.CriarPessoaTest)
-ok      11 test POST /pessoas :: 201 :: quando todos campos são válidos (Elixir.CriarPessoaTest)
-ok      12 test POST /pessoas :: 422 :: quando campo `dataNascimento` está vazio (Elixir.CriarPessoaTest)
-ok      13 test POST /pessoas :: 422 :: quando campo `stack` possui elemento que excede limite de caracteres (Elixir.CriarPessoaTest)
-ok      14 test POST /pessoas :: 422 :: quando campo `dataNascimento` term formato invalido (Elixir.CriarPessoaTest)
-ok      15 test POST /pessoas :: 422 :: quando campo `nome` tem caracteres especiais (Elixir.CriarPessoaTest)
+POST /pessoas :: 201 :: quando todos campos são válidos
+POST /pessoas :: 201 :: quando todos campos são válidos (stack null)
+POST /pessoas :: 422 :: quando nenhum campo é informado
+POST /pessoas :: 422 :: quando campo `nome` está vazio
+POST /pessoas :: 422 :: quando campo `nome` tem caracteres especiais
+POST /pessoas :: 422 :: quando campo `nome` excede limite de caracteres
+POST /pessoas :: 422 :: quando campo `dataNascimento` está vazio
+POST /pessoas :: 422 :: quando campo `dataNascimento` term formato invalido
+POST /pessoas :: 422 :: quando campo `stack` possui elemento que excede limite de caracteres
+POST /pessoas :: 422 :: quando campo `apelido` está vazio
+POST /pessoas :: 422 :: quando campo `apelido` excede limite de caracteres
+POST /pessoas :: 422 :: quando `apelido` já existe
+#                ^ Olha, até caberia um 409 (conflict) aqui, mas como a
+#                  resposta contém os erros de validação de todos os campos
+#                  (1+n) então achei mais adequado mandar 422 independente de
+#                  quais errors foram encontrados.
+
+GET /pessoas/:id :: 200 :: quando existe pessoa com o dado id
+GET /pessoas/:id :: 404 :: quando não existe pessoa com o dado id
+
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `qtd` mostra a quantidade de resultados na página
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `total` mostra a quantidade total de resultados existentes
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `pagina` mostra o número da página atual
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `anterior` mostrá o número da página anterior (se houver)
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `proxima` mostrá o número da proxima página (se houver)
+GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `resultados` contém os resultados
+GET /pessoas[?pagina=0&limite=10] :: 200 :: é possível iterar sobre as páginas
+GET /pessoas?pagina=999999        :: 200 :: (página não existente) retorna o número da ultima página com conteúdo no campo 'anterior'
+
+GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por nome
+GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por apelido
+GET /pessoas?q=termo :: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico
 ```

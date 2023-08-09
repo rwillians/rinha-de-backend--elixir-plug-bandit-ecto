@@ -26,4 +26,4 @@ database_url =
 config :rinha, Rinha.Repo,
   url: database_url,
   pool: Ecto.Adapters.SQL.Sandbox,
-  force: true
+  force_drop: true
