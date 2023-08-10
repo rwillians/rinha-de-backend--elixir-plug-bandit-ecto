@@ -29,20 +29,13 @@ echo "└───────────────────────�
 echo "${COLOR_OFF}${BOLD_WHITE}"
 echo "   # IMPORTANTE"
 echo "${COLOR_OFF}${DIM}"
-echo "     Se certifique de ${RED}rodar o script \`script/reset\`${COLOR_OFF}${DIM} para ${RED}resetar e/ou"
-echo "     inicializar${COLOR_OFF}${DIM} o banco de dados -- executará script de migração. O script"
-echo "     deve ser executado à partir do diretório raiz do projeto."
-echo ""
-echo "${COLOR_OFF}${BOLD_WHITE}"
-echo "   # SOBRE O TESTE DE CARGA"
-echo "${COLOR_OFF}${DIM}"
 echo "     Quando a API for inicializada, ainda será necessário aguardar alguns"
 echo "     segundos antes de iniciar o teste para que dê tempo de inicializar"
 echo "     todas as conexões necessárias com o banco de dados."
 echo ""
 echo "     Portanto, ${COLOR_OFF}${GREEN}quando você ver a mensagem \"starting http server...\","
 echo "     espere mais uns ~10s${COLOR_OFF}${DIM} para começar a mandar carga para a API. Espere"
-echo "     o consumo de vCPU zero (ou se aproximar de zero -- você pode monitorar"
+echo "     o consumo de vCPU zerar (ou se aproximar de zero -- você pode monitorar"
 echo "     isso utilizando \`ctop\`) e então dê início ao teste."
 echo "${COLOR_OFF}${BOLD_WHITE}"
 echo ""
@@ -52,6 +45,6 @@ read -n 1 -s -r -p "Precione qualquer tecla para continuar... "
 echo ""
 echo ""
 
-docker compose down && \
+docker compose down --volumes && \
   docker compose up -d nginx api postgres && \
   docker compose logs -f nginx api postgres

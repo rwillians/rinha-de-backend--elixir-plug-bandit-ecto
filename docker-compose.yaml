@@ -4,14 +4,14 @@ services:
   postgres:
     image: postgres:15.3-alpine3.18
     container_name: rinha-postgres
-    command: '-c shared_buffers=128MB -c max_connections=150'
+    command: '-c shared_buffers=128MB -c max_connections=200'
     environment:
       - 'POSTGRES_DB=rinha_dev'
       - 'POSTGRES_USER=postgres'
       - 'POSTGRES_PASSWORD=postgres'
       - 'LANG=en_US.utf8'
     volumes:
-      - '.data/postgres/pgdata/:/var/lib/postgresql/data'
+      - './priv/repo/structure.sql:/docker-entrypoint-initdb.d/ddl.sql'
     deploy:
       mode: global
       resources:
@@ -27,18 +27,6 @@ services:
         max_attempts: 3
         window: 60s
 
-  migration:
-    # just a task, it won't run during the test
-    image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
-    container_name: rinha-migration
-    depends_on:
-      - postgres
-    environment:
-      - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
-      - 'POOL_SIZE=1'
-    entrypoint: [ "sh", "-c" ]
-    command: [ 'busybox sleep 15s && mix ecto.setup' ]
-
   api:
     image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
     depends_on:
@@ -48,13 +36,11 @@ services:
       - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=75'
+      - 'POOL_SIZE=100'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
     command: [ 'busybox sleep 10s && echo "starting http server..." && _build/prod/rel/rinha/bin/rinha start' ]
-    # ports:
-    #   - '${PORT:-8080}:3000'
     deploy:
       mode: replicated
       replicas: 2
@@ -85,7 +71,7 @@ services:
       resources:
         limits:
           cpus: '0.20'
-          memory: 64M
+          memory: 96M
         reservations:
           cpus: '0.05'
           memory: 16M

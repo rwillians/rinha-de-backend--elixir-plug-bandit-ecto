@@ -1,0 +1,5 @@
+#! /usr/bin/env sh
+
+ROOT_PATH=${PWD%%*(scripts)}
+
+bun ${ROOT_PATH}/scripts/src/gerar-queries.ts > ${ROOT_PATH}/scripts/k6/queries.txt
