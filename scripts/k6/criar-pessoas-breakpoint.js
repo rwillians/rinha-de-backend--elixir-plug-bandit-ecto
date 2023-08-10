@@ -8,14 +8,16 @@ export const options = {
     http_req_duration: ['p(95)<100'],
   },
   scenarios: {
-    breakingpoint: {
+    finding_max_req_p95_100ms: {
       executor: 'ramping-arrival-rate',
       stages: [
-        { duration: '5s', target: 1000 },
-        { duration: '5s', target: 1700 },
-        { duration: '110s', target: 20000 },
+        { duration: '10s', target: 1700 },
+        { duration: '60s', target: 1700 },
       ],
       preAllocatedVUs: 1024,
+      //               ^ Gargalo é o limite de `worker_connections` do nginx.
+      //                 Não adianta aumentar o limite sem dar mais vcpu pro
+      //                 nginx e eu não tenho mais de onde tirar vcpu.
       startRate: 1
     },
   },

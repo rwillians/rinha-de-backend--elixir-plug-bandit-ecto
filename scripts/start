@@ -46,5 +46,5 @@ echo ""
 echo ""
 
 docker compose down --volumes && \
-  docker compose up -d nginx api postgres && \
-  docker compose logs -f nginx api postgres
+  docker compose up -d && \
+  docker compose logs -f
