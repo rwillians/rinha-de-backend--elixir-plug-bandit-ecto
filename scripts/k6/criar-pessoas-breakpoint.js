@@ -11,8 +11,8 @@ export const options = {
     finding_max_req_p95_100ms: {
       executor: 'ramping-arrival-rate',
       stages: [
-        { duration: '10s', target: 1700 },
-        { duration: '60s', target: 1700 },
+        { duration: '10s', target: 1800 },
+        { duration: '60s', target: 1800 },
       ],
       preAllocatedVUs: 1024,
       //               ^ Gargalo é o limite de `worker_connections` do nginx.
