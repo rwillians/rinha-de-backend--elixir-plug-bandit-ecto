@@ -6,7 +6,6 @@
 /tmp/
 /doc/
 *.ez
-.envrc
 .DS_Store
 rinha-*.tar
 erl_crash.dump

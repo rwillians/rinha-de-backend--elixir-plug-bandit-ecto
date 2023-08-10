@@ -14,6 +14,10 @@ const STACK = [
 
 const STACK_LENGTH = STACK.length;
 
+function rand() {
+  return (~~(Math.random() * 10)).toString();
+}
+
 function pessoa() {
   const bday = faker.date.birthdate();
   const year = bday.getUTCFullYear();
@@ -22,12 +26,12 @@ function pessoa() {
 
   return {
     nome: faker.person.fullName(),
-    apelido: faker.internet.userName(),
+    apelido: faker.internet.userName() + rand(),
     data_nascimento: `${year}-${month}-${day}`,
     stack: STACK[~~(Math.random() * STACK_LENGTH)]
   }
 }
 
-for (let i = 0; i < 1_000_000; i++) {
+for (let i = 0; i < 500_000; i++) {
   process.stdout.write(JSON.stringify(pessoa()) + '\n');
 }

@@ -22,19 +22,17 @@ RUN mix release
 
 FROM elixir:1.15.4-alpine AS prod
 
-RUN apk add --no-cache coreutils && \
-    #                      ^ because I need the `ping` command to use from inside
-    #                        docker-compose
-    mix local.hex --force && \
+RUN mix local.hex --force && \
     mix local.rebar --force
 
 WORKDIR /app
 ENV MIX_ENV=prod
 
 COPY --from=build /app/ /app/
-COPY .docker/api/wait-for-it /usr/bin/wait-for-it
+
+STOPSIGNAL SIGINT
 
 ENV PORT=3000
 EXPOSE 3000
 
-ENTRYPOINT [ "_build/prod/rel/rinha/bin/rinha" ]
+ENTRYPOINT [ "_build/prod/rel/rinha/bin/rinha", "start" ]

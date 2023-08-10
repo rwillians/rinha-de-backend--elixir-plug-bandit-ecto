@@ -1,0 +1,8 @@
+#! /usr/bin/env sh
+
+ROOT_PATH=${PWD%%*(/scripts)}
+
+docker compose down --volumes && \
+  rm -rf ${ROOT_PATH}/.data/postgres/pgdata/ && \
+  docker compose run migration && \
+  docker compose down --remove-orphans

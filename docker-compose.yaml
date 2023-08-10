@@ -3,21 +3,21 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15.3-alpine3.18
-    command: '-c max_connections=200'
+    container_name: rinha-postgres
+    command: '-c shared_buffers=128MB -c max_connections=150'
     environment:
       - 'POSTGRES_DB=rinha_dev'
       - 'POSTGRES_USER=postgres'
       - 'POSTGRES_PASSWORD=postgres'
-      - 'PGDATA=/data/pgdata'
       - 'LANG=en_US.utf8'
     volumes:
-      - '${PGDATA:-.docker/postgres/}:/data'
+      - '.data/postgres/pgdata/:/var/lib/postgresql/data'
     deploy:
       mode: global
       resources:
         limits:
-          cpus: '2.00'
-          memory: 2048M
+          cpus: '0.40'
+          memory: 384M
         reservations:
           cpus: '0.10'
           memory: 128M
@@ -28,43 +28,43 @@ services:
         window: 60s
 
   migration:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${APP_VERSION:-latest}
+    # just a task, it won't run during the test
+    image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
+    container_name: rinha-migration
     depends_on:
       - postgres
     environment:
       - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
+      - 'POOL_SIZE=1'
     entrypoint: [ "sh", "-c" ]
-    command: [ 'busybox sleep 10s && mix ecto.setup' ]
+    command: [ 'busybox sleep 15s && mix ecto.setup' ]
 
   api:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${APP_VERSION:-latest}
+    image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
     depends_on:
       - postgres
-      - migration
     environment:
       - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
       - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=100'
+      - 'POOL_SIZE=50'
     entrypoint: [ "sh", "-c" ]
-    ##
-    #           ↓ Demora alguns segundos para o banco de dados ficar
-    #           ↓ disponível então precisamos esperar para que seja possível
-    #           ↓ rodar `mix ecto.setup`. Esse script irá criar o banco (se
-    #           ↓ ainda não existir) e executará migrações pendentes (se houver
-    #           ↓ alguma).
-    command: [ 'busybox sleep 15s && _build/prod/rel/rinha/bin/rinha start' ]
+    #                   ↓ Demora alguns segundos para o banco de dados ficar
+    #                   ↓ disponível então precisamos esperar um pouco.
+    command: [ 'busybox sleep 10s && echo "starting http server..." && _build/prod/rel/rinha/bin/rinha start' ]
+    # ports:
+    #   - '${PORT:-8080}:3000'
     deploy:
       mode: replicated
       replicas: 2
       resources:
         limits:
-          cpus: '1.25'
-          memory: 1024M
+          cpus: '0.475'
+          memory: 192M
         reservations:
           cpus: '0.10'
-          memory: 128M
+          memory: 32M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -73,8 +73,9 @@ services:
 
   nginx:
     image: nginx:1.25.1-alpine3.17-slim
+    container_name: rwillians-ngnix
     volumes:
-      - '.docker/nginx/conf.d/:/etc/nginx/conf.d/:ro'
+      - '.data/nginx/conf.d/:/etc/nginx/conf.d/:ro'
     depends_on:
       - api
     ports:
@@ -83,11 +84,11 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.75'
-          memory: 384M
+          cpus: '0.15'
+          memory: 32M
         reservations:
-          cpus: '0.10'
-          memory: 64M
+          cpus: '0.05'
+          memory: 16M
       restart_policy:
         condition: on-failure
         delay: 5s

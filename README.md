@@ -16,48 +16,30 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 - [ ] pipelines para publicar imagens OCI atualizadas quando fizer merge para branch `main`.
 
 
-## Como rodar
-
-### Docker compose
+## Rodando com Docker Compose
 
 A imagem OCI já está compilada e está disponível publicamente (vide endereço em `docker-compose.yaml`).
-O `docker-compose.yaml`já está configurado com limites de recursos os quais podem ser utilizados da máquina hospedeira (6 cores de CPU e 4480MiB de memória RAM, ao todo) e também define a quantidade de replicas para cada serviço.
+O `docker-compose.yaml`já está configurado de forma que cada serviço tem seus limites de recursos estabelecidos (1.5 vCPU e 1367MiB RAM, ao todo) e também a quantidade de réplicas.
 
-Portanto, a unica coisa que você precisa fazer é rodar up:
+Para preparar o banco de dados para o teste de carga, é preciso primeiro rodar um script o qual irá limpar e/ou iniciar o banco de dados:
 
 ```sh
-docker compose up
+# dentro do diretório raiz do projeto
+scripts/reset
 ```
 
 > **Note**
-> Devido ao serviço `postgres` demorar varios segundos para inicializar, principalmente na primeira execução, o serviço `migration` espera por 10s antes de ser executo. E as réplicas do serviço `api`, as quais só devem ser inicializadas após a migração, esperam por 15s.
+> É possível que o script `scripts/reset` falhe (erro `DBConnection.ConnectionError`) caso o postgres tenha demorado de mais para inicializar. Tente rodar novamente.
 
-### Local
-
-Esse projeto utiliza [`asdf-vm`](https://github.com/asdf-vm/asdf) para gerenciar versão de dependecias, como Elixir e Erlang.
-Caso você já tenha `asdf-vm` instalado e configurado, basta rodar o seguinte comando dentro do diretório raiz desse projeto:
+Tendo executado o script `scripts/reset` com sucesso, agora é só rodar o start:
 
 ```sh
-asdf install
+# dentro do diretório raiz do projeto
+scripts/reset
 ```
 
-Para instalar as dependências do projeto, rode:
-
-```sh
-mix deps.get
-```
-
-Depois compile o projeto:
-
-```sh
-mix compile
-```
-
-E, por fim, use o seguinte comando para rodar o servidor:
-
-```sh
-mix server
-```
+> **Note**
+> Após as instâncias do servidor HTTP inicializar, há um período de alguns segundos de intenso uso de CPU enquato a poll de conexões com o banco de dados é inicializada. É recomendado esperar esse período acabar antes dar início ao teste de carga -- espere o consumo de CPU voltar a zero (ou quase zero), você pode utilizar [`ctop`](https://github.com/bcicen/ctop) para monitorar os recursos utilizados pelos containers.
 
 
 ## Testes de contrato
@@ -96,3 +78,22 @@ GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por nome
 GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por apelido
 GET /pessoas?q=termo :: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico
 ```
+
+## Teste de carga com K6
+
+> **Warning**
+> É necessário ter o CLI do `k6` instalado ([ver instruções](https://k6.io/docs/get-started/installation/) -- no macos: `brew install k6`).
+
+Esse projeto inclui testes de carga com [K6](https://k6.io/). Para executá-los, siga os seguintes passos:
+
+1.  **Gerar carga de teste**:
+
+    Execute o comando `scripts/gerar-pessoas` à partir do diretório raiz da aplicação. Ele criará o arquivo `scripts/k6/pessoas.jsonl`.
+
+2.  **Teste 1 - criar pessoas**:
+
+    À partir do diretório `scripts/k6`, execute o comando `k6 run criar-pessoas.js`. Esse teste criará pessoas no banco de dados, possibilitando o próximo teste.
+
+3.  **Test 2 - iterar sobre as pessoas existentes no banco de dados**:
+
+    Também à partir do diretório `scripts/k6`, execute o comando `k6 iterar-pessoas.js`. Esse teste irá descobrir pessoas iterando sobre as páginas retornadas pela rota `/pessoas?pagina=n&limite=n` e então irá buscar individualmente o registro de cada pessoa na rota `/pessoas/:id`.
