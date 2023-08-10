@@ -17,7 +17,7 @@ services:
       resources:
         limits:
           cpus: '0.40'
-          memory: 384M
+          memory: 512M
         reservations:
           cpus: '0.10'
           memory: 128M
@@ -48,7 +48,7 @@ services:
       - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=50'
+      - 'POOL_SIZE=75'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
@@ -60,8 +60,8 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: '0.475'
-          memory: 192M
+          cpus: '0.45'
+          memory: 256M
         reservations:
           cpus: '0.10'
           memory: 32M
@@ -84,8 +84,8 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.15'
-          memory: 32M
+          cpus: '0.20'
+          memory: 64M
         reservations:
           cpus: '0.05'
           memory: 16M
