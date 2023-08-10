@@ -41,7 +41,7 @@ defmodule Pessoa do
   @max_char_error_msg "deve conter no máximo %{count} caracteres"
 
   @accents "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇ"
-  @name_pattern ~r/^[a-zA-Z#{@accents}\s]+$/
+  @name_pattern ~r/^[a-zA-Z#{@accents}\.\s]+$/
 
   def changeset(pessoa, params \\ %{}) do
     pessoa

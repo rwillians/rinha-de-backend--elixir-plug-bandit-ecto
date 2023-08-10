@@ -20,8 +20,8 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 
 ### Docker compose
 
-A imagem OCI já está compilada e está disponível publicamente (vide endereço em `"docker-compose.yaml"`).
-O `"docker-compose.yaml"`já está configurado com limites de recursos os quais podem ser utilizados da máquina hospedeira (4 cores de CPU e 4GB de memória RAM, ao todo) e também define a quantidade de replicas para cada serviço.
+A imagem OCI já está compilada e está disponível publicamente (vide endereço em `docker-compose.yaml`).
+O `docker-compose.yaml`já está configurado com limites de recursos os quais podem ser utilizados da máquina hospedeira (6 cores de CPU e 4480MiB de memória RAM, ao todo) e também define a quantidade de replicas para cada serviço.
 
 Portanto, a unica coisa que você precisa fazer é rodar up:
 
@@ -29,11 +29,8 @@ Portanto, a unica coisa que você precisa fazer é rodar up:
 docker compose up
 ```
 
-Por padrão, o load balancer será exposto na porta `8080`. Essa configuração poderá ser alterado definindo a variável de ambiente `LB_PORT` com o número da porta desejada. Por exemplo:
-
-```sh
-LB_PORT=8888 docker compose up
-```
+> **Note**
+> Devido ao serviço `postgres` demorar varios segundos para inicializar, principalmente na primeira execução, o serviço `migration` espera por 10s antes de ser executo. E as réplicas do serviço `api`, as quais só devem ser inicializadas após a migração, esperam por 15s.
 
 ### Local
 

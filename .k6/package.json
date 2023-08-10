@@ -1,0 +1,9 @@
+{
+  "name": "@rwillians/rinha-backend",
+  "private": true,
+  "devDependencies": {},
+  "dependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "k6": "^0.0.0"
+  }
+}

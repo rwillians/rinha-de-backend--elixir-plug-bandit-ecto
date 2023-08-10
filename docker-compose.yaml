@@ -1,17 +1,9 @@
 version: '3.8'
 
-# Limite de recursos: 7cpu, 5GB RAM
-#                     ↳ não compensa escalar a api horizontal antes de escalar
-#                       vertical, então estou colocando 2cpu para cada instância
-#                       (2 instâncias de 2 cpu = 4 cpu)
-#                     ↳ para o banco conseguir acompanhar as instâncias achei
-#                       por bem alocar 2 cpu para ele
-#                     ↳ pro nginx conseguir acompanhar as instâncias da api,
-#                       achei melhor alocar 1cpu.
-
 services:
   postgres:
     image: postgres:15.3-alpine3.18
+    command: '-c max_connections=200'
     environment:
       - 'POSTGRES_DB=rinha_dev'
       - 'POSTGRES_USER=postgres'
@@ -35,15 +27,26 @@ services:
         max_attempts: 3
         window: 60s
 
-  api:
+  migration:
     image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${APP_VERSION:-latest}
     depends_on:
       - postgres
     environment:
       - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
-      - 'RELEASE_COOKIE=foobar'
+    entrypoint: [ "sh", "-c" ]
+    command: [ 'busybox sleep 10s && mix ecto.setup' ]
+
+  api:
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${APP_VERSION:-latest}
+    depends_on:
+      - postgres
+      - migration
+    environment:
+      - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
+      - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
+      - 'POOL_SIZE=100'
     entrypoint: [ "sh", "-c" ]
     ##
     #           ↓ Demora alguns segundos para o banco de dados ficar
@@ -51,13 +54,13 @@ services:
     #           ↓ rodar `mix ecto.setup`. Esse script irá criar o banco (se
     #           ↓ ainda não existir) e executará migrações pendentes (se houver
     #           ↓ alguma).
-    command: [ 'wait-for-it "postgres:5432" && mix ecto.setup && _build/prod/rel/rinha/bin/rinha start' ]
+    command: [ 'busybox sleep 15s && _build/prod/rel/rinha/bin/rinha start' ]
     deploy:
       mode: replicated
       replicas: 2
       resources:
         limits:
-          cpus: '2.00'
+          cpus: '1.25'
           memory: 1024M
         reservations:
           cpus: '0.10'
@@ -75,13 +78,13 @@ services:
     depends_on:
       - api
     ports:
-      - '${LB_PORT:-8080}:8080'
+      - '${PORT:-8080}:8080'
     deploy:
       mode: global
       resources:
         limits:
-          cpus: '1.00'
-          memory: 1024M
+          cpus: '0.75'
+          memory: 384M
         reservations:
           cpus: '0.10'
           memory: 64M

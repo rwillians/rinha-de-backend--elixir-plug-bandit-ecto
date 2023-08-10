@@ -3,7 +3,7 @@ FROM elixir:1.15.4-alpine AS build
 WORKDIR /app
 ENV MIX_ENV=prod
 
-RUN apk add --no-cache git coreutils ncurses libstdc++ libgcc && \
+RUN apk add --no-cache git ncurses libstdc++ libgcc && \
     mix local.hex --force && \
     mix local.rebar --force
 
