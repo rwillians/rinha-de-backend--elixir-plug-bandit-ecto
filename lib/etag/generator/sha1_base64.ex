@@ -10,5 +10,6 @@ defmodule ETag.Generator.SHA1Base64 do
   import Base, only: [encode64: 1]
 
   @impl true
+  def generate(nil), do: nil
   def generate(content), do: hash(:sha, content) |> encode64()
 end

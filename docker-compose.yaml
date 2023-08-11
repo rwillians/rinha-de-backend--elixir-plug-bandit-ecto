@@ -3,8 +3,8 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15.3-alpine3.18
-    container_name: rinha-postgres
-    command: '-c shared_buffers=256MB -c max_connections=200'
+    container_name: rwillians-rinha-postgres
+    command: '-c shared_buffers=256MB -c max_connections=100'
     environment:
       - 'POSTGRES_DB=rinha_dev'
       - 'POSTGRES_USER=postgres'
@@ -16,8 +16,8 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.45'
-          memory: 864M
+          cpus: '0.375'
+          memory: 512M
         reservations:
           cpus: '0.10'
           memory: 128M
@@ -28,8 +28,7 @@ services:
         window: 60s
 
   api1:
-    image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
-    container_name: rinha-backend-api1
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}
     depends_on:
       - postgres
     environment:
@@ -37,16 +36,17 @@ services:
       - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=100'
+      - 'POOL_SIZE=50'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
     command: [ 'busybox sleep 10s && echo "starting http server..." && _build/prod/rel/rinha/bin/rinha start' ]
     deploy:
       mode: global
+      # replicas: 2
       resources:
         limits:
-          cpus: '0.425'
+          cpus: '0.4125'
           memory: 256M
         reservations:
           cpus: '0.10'
@@ -58,8 +58,7 @@ services:
         window: 60s
 
   api2:
-    image: 'ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}'
-    container_name: rinha-backend-api2
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}
     depends_on:
       - postgres
     environment:
@@ -67,16 +66,17 @@ services:
       - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=100'
+      - 'POOL_SIZE=50'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
     command: [ 'busybox sleep 10s && echo "starting http server..." && _build/prod/rel/rinha/bin/rinha start' ]
     deploy:
       mode: global
+      # replicas: 2
       resources:
         limits:
-          cpus: '0.425'
+          cpus: '0.4125'
           memory: 256M
         reservations:
           cpus: '0.10'
@@ -87,11 +87,36 @@ services:
         max_attempts: 3
         window: 60s
 
-  nginx:
-    image: nginx:1.25.1-alpine3.17-slim
-    container_name: rwillians-ngnix
+  # load-balancer:
+  #   image: nginx:1.25.1-alpine3.17-slim
+  #   container_name: rwillians-rinha-lb
+  #   volumes:
+  #     - '.data/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+  #   depends_on:
+  #     - api1
+  #     - api2
+  #   ports:
+  #     - '${PORT:-8080}:8080'
+  #   deploy:
+  #     mode: global
+  #     resources:
+  #       limits:
+  #         cpus: '0.30'
+  #         memory: 24M
+  #       reservations:
+  #         cpus: '0.05'
+  #         memory: 16M
+  #     restart_policy:
+  #       condition: on-failure
+  #       delay: 5s
+  #       max_attempts: 3
+  #       window: 60s
+
+  load-balancer:
+    image: haproxy:2.8.2-alpine
+    container_name: rwillians-rinha-lb
     volumes:
-      - '.data/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '.data/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
     depends_on:
       - api1
       - api2
@@ -102,7 +127,7 @@ services:
       resources:
         limits:
           cpus: '0.20'
-          memory: 96M
+          memory: 24M
         reservations:
           cpus: '0.05'
           memory: 16M
