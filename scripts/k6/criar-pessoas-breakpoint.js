@@ -8,23 +8,13 @@ export const options = {
     http_req_duration: ['p(95)<2'],
   },
   scenarios: {
-    finding_max_req_p95_100ms: {
+    find_max_reqs_with_p95_under_100: {
       executor: 'ramping-arrival-rate',
       stages: [
-        { duration: '10s', target: 1500 },
-        { duration: '60s', target: 1500 },
+        { duration: '10s', target: 2500 },
+        { duration: '60s', target: 2500 },
       ],
-      preAllocatedVUs: 5,
-      //               ^ Gargalo é o limite de `worker_connections` do nginx.
-      //                 Não adianta aumentar o limite sem dar mais vcpu pro
-      //                 nginx e eu não tenho mais de onde tirar vcpu.
-      //                 Se eu aumentar vcpu para o nginx aceitar mais conexões,
-      //                 dai o tamanho tá poll de conexões das instâncias da
-      //                 api para com o postgres se tornam insuficientes e
-      //                 eu precisaria aumentar cpu para ambos.
-      //                 Então vou aceitar o limite de 1024 conexões e buscar
-      //                 o número máximo de req/s mantendo p95<100ms -- o qual,
-      //                 no momento, aparenta ser 1800 req/s.
+      preAllocatedVUs: 256,
       startRate: 1
     },
   },
