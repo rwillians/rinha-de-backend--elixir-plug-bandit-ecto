@@ -11,7 +11,7 @@ defmodule Ex.Ecto.Query do
 
   alias Ex.Ecto.Query.Page
 
-  @default_max_page_size 10
+  @default_max_page_size 50
 
   @doc """
   Função a qual, dado uma keyword list de filtros e uma função de query
@@ -51,10 +51,10 @@ defmodule Ex.Ecto.Query do
       |> one()
 
     with {:page_exists?, true} <- {:page_exists?, offset < total_count} do
-         #               ^ É pra rodar a segunds query apenas se a gente sabe
-         #                 que há conteúdo pra ser retornado. Se o offset for
-         #                 maior que o número total de pessoas filtradas, não
-         #                 tem por que rodar a segunda query.
+      #               ^ É pra rodar a segunds query apenas se soubermos que
+      #                 há conteúdo pra ser retornado. Se o offset for maior
+      #                 do que o número total de pessoas filtradas, não tem
+      #                 o por que rodar a segunda query.
       page_results = from(row in query, limit: ^limit, offset: ^offset) |> all()
       page_results_count = length(page_results)
 

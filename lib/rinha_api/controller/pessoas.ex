@@ -42,7 +42,7 @@ defmodule RinhaAPI.Controller.Pessoas do
   def listar_pessoas(%Plug.Conn{} = conn) do
     page =
       atomize_keys(conn.query_params)
-      |> take([:pagina, :limite, :q])
+      |> take([:pagina, :limite, :t])
       |> paginated(&pessoas_query/1)
 
     send_resp_json(conn, 200, page)

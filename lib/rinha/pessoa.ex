@@ -13,17 +13,17 @@ defmodule Pessoa do
           id: Ecto.UUID.t(),
           nome: String.t(),
           apelido: String.t(),
-          data_nascimento: Date.t(),
+          nascimento: Date.t(),
           stack: [String.t(), ...] | nil
         }
 
   @primary_key false
-  @derive {Jason.Encoder, only: [:id, :nome, :apelido, :data_nascimento, :stack]}
+  @derive {Jason.Encoder, only: [:id, :nome, :apelido, :nascimento, :stack]}
   schema "pessoas" do
     field :id, Ecto.UUID, autogenerate: true, primary_key: true
     field :nome, :string
     field :apelido, :string
-    field :data_nascimento, :date
+    field :nascimento, :date
     field :stack, {:array, :string}
   end
 
@@ -42,11 +42,13 @@ defmodule Pessoa do
 
   @accents "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇ"
   @name_pattern ~r/^[a-zA-Z#{@accents}\.\s]+$/
+  #                                    ^ minha carge de teste gerou nomes
+  #                                      incluindo títulos como "Dr. ..."
 
   def changeset(pessoa, params \\ %{}) do
     pessoa
-    |> cast(params, [:nome, :apelido, :data_nascimento, :stack])
-    |> validate_required([:nome, :apelido, :data_nascimento], message: @required_error_msg)
+    |> cast(params, [:nome, :apelido, :nascimento, :stack])
+    |> validate_required([:nome, :apelido, :nascimento], message: @required_error_msg)
     |> validate_length(:nome, min: 3, message: @min_char_error_msg)
     |> validate_length(:nome, max: 75, message: @max_char_error_msg)
     |> validate_format(:nome, @name_pattern, message: @alphabet_error_msg)
@@ -69,7 +71,7 @@ defmodule Pessoa do
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
-  defp filter(query, [{:q, str} | tail]) do
+  defp filter(query, [{:t, str} | tail]) do
     query
     |> where([p], search_score(p.nome, p.apelido, p.stack, ^@reasonable_score, ^str) > ^@reasonable_score)
     |> order_by([p], desc: search_score(p.nome, p.apelido, p.stack, ^@reasonable_score, ^str), asc: p.nome)

@@ -44,6 +44,7 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
 
       assert conn.state == :sent
       assert conn.status == 200
+
       assert conn.body_params["qtd"] == 4
     end
 
@@ -52,6 +53,7 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
 
       assert conn.state == :sent
       assert conn.status == 200
+
       assert conn.body_params["total"] == 4
     end
 
@@ -60,6 +62,7 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
 
       assert conn.state == :sent
       assert conn.status == 200
+
       assert conn.body_params["pagina"] == 0
     end
 
@@ -143,11 +146,12 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
 
       assert conn.state == :sent
       assert conn.status == 200
+
       assert conn.body_params["anterior"] == 3
     end
   end
 
-  describe "GET /pessoas?q=termo" do
+  describe "GET /pessoas?t=termo" do
     setup ctx do
       %{status: 201} = conn(:post, "/pessoas", Enum.at(@fixtures, 0)) |> send_req()
       %{status: 201} = conn(:post, "/pessoas", Enum.at(@fixtures, 1)) |> send_req()
@@ -158,52 +162,59 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
     end
 
     test ":: 200 :: é possível pesquisar pessoas por nome" do
-      conn = conn(:get, "/pessoas?q=silva") |> send_req()
+      conn = conn(:get, "/pessoas?t=silva") |> send_req()
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 2), Enum.at(@fixtures, 3), Enum.at(@fixtures, 1)]
-    end
-
-    test ":: 200 :: é possível pesquisar pessoas por apelido" do
-      conn = conn(:get, "/pessoas?q=jsilva") |> send_req()
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 2), Enum.at(@fixtures, 1)]
-    end
-
-    test ":: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico" do
-      conn = conn(:get, "/pessoas?q=Fortran") |> send_req()
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 3)]
-
-      conn = conn(:get, "/pessoas?q=TS") |> send_req()
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 0)]
-
-      conn = conn(:get, "/pessoas?q=ts") |> send_req()
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert drop_id(conn.body_params["resultados"]) == []
-
-      conn = conn(:get, "/pessoas?q=JS") |> send_req()
       assert conn.state == :sent
       assert conn.status == 200
 
       assert drop_id(conn.body_params["resultados"]) == [
-        Enum.at(@fixtures, 3),
-        #                  ^ Por que tem skill `"JS"` e por que está ordenado por
-        #                    nome ASC como critério de desimpate
-        Enum.at(@fixtures, 0),
-        #                  ^ Por que tem a skill `"JS"`
-        Enum.at(@fixtures, 2),
-        #                  ^ Por que tem `"js"` no apelido
-        Enum.at(@fixtures, 1)
-        #                  ^ Por que tem `"js"` no apelido
-      ]
+               Enum.at(@fixtures, 2),
+               Enum.at(@fixtures, 3),
+               Enum.at(@fixtures, 1)
+             ]
+    end
+
+    test ":: 200 :: é possível pesquisar pessoas por apelido" do
+      conn = conn(:get, "/pessoas?t=jsilva") |> send_req()
+
+      assert conn.state == :sent
+      assert conn.status == 200
+
+      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 2), Enum.at(@fixtures, 1)]
+    end
+
+    test ":: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico" do
+      conn = conn(:get, "/pessoas?t=Fortran") |> send_req()
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 3)]
+
+      conn = conn(:get, "/pessoas?t=TS") |> send_req()
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 0)]
+
+      conn = conn(:get, "/pessoas?t=ts") |> send_req()
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert drop_id(conn.body_params["resultados"]) == []
+
+      conn = conn(:get, "/pessoas?t=JS") |> send_req()
+      assert conn.state == :sent
+      assert conn.status == 200
+
+      assert drop_id(conn.body_params["resultados"]) == [
+               Enum.at(@fixtures, 3),
+               #                  ^ Por que tem skill `"JS"` e por que está
+               #                    ordenado por `nome ASC` como critério de
+               #                    desimpate
+               Enum.at(@fixtures, 0),
+               #                  ^ Por que tem a skill `"JS"`
+               Enum.at(@fixtures, 2),
+               #                  ^ Por que tem `"js"` no apelido
+               Enum.at(@fixtures, 1)
+               #                  ^ Por que tem `"js"` no apelido
+             ]
     end
   end
 

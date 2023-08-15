@@ -74,9 +74,9 @@ GET /pessoas[?pagina=0&limite=10] :: 200 :: campo `resultados` contém os result
 GET /pessoas[?pagina=0&limite=10] :: 200 :: é possível iterar sobre as páginas
 GET /pessoas?pagina=999999        :: 200 :: (página não existente) retorna o número da ultima página com conteúdo no campo 'anterior'
 
-GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por nome
-GET /pessoas?q=termo :: 200 :: é possível pesquisar pessoas por apelido
-GET /pessoas?q=termo :: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico
+GET /pessoas?t=termo :: 200 :: é possível pesquisar pessoas por nome
+GET /pessoas?t=termo :: 200 :: é possível pesquisar pessoas por apelido
+GET /pessoas?t=termo :: 200 :: dá pra pesquisar por skill da stack também, mas tem que ser identico
 ```
 
 ## Teste de carga com K6
