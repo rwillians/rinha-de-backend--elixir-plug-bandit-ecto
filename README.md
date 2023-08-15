@@ -18,28 +18,22 @@ Implementação da API proposta para [rinha de backend 2023Q3](https://github.co
 
 ## Rodando com Docker Compose
 
-A imagem OCI já está compilada e está disponível publicamente (vide endereço em `docker-compose.yaml`).
-O `docker-compose.yaml`já está configurado de forma que cada serviço tem seus limites de recursos estabelecidos (1.5 vCPU e 1367MiB RAM, ao todo) e também a quantidade de réplicas.
+A imagem OCI já está compilada e está disponível publicamente (vide endereço em `docker-compose.yaml`). O arquivo `docker-compose.yaml` incluso no projetojá está configurado de forma que cada serviço tem seus limites de recursos estabelecidos, de acordo com a regra da [rinha de backend 2023Q3](https://github.com/zanfranceschi/rinha-de-backend-2023-q3).
 
-Para preparar o banco de dados para o teste de carga, é preciso primeiro rodar um script o qual irá limpar e/ou iniciar o banco de dados:
-
-```sh
-# dentro do diretório raiz do projeto
-scripts/reset
-```
-
-> **Note**
-> É possível que o script `scripts/reset` falhe (erro `DBConnection.ConnectionError`) caso o postgres tenha demorado de mais para inicializar. Tente rodar novamente.
-
-Tendo executado o script `scripts/reset` com sucesso, agora é só rodar o start:
+Para simplificar o processo de limpeza de execuções prévias, execute o seguinte comando à partir do diretório raiz da aplicação:
 
 ```sh
-# dentro do diretório raiz do projeto
-scripts/reset
+scripts/start
 ```
 
+O script `start` irá limpar os vestígios de execuções prévias e irá iniciar a aplicação utilizando [docker compose](https://docs.docker.com/compose/compose-file/compose-file-v3/).
+
 > **Note**
-> Após as instâncias do servidor HTTP inicializar, há um período de alguns segundos de intenso uso de CPU enquato a poll de conexões com o banco de dados é inicializada. É recomendado esperar esse período acabar antes dar início ao teste de carga -- espere o consumo de CPU voltar a zero (ou quase zero), você pode utilizar [`ctop`](https://github.com/bcicen/ctop) para monitorar os recursos utilizados pelos containers.
+> Após as instâncias do servidor HTTP inicializar, há um período de alguns segundos de intenso uso de CPU enquato a poll de conexões com o banco de dados é inicializada. É recomendado esperar esse período acabar antes dar início os testes de desempenho.
+>
+> Para simplificar o projeto, não há uma mensagem clara indicando quando o sistema está pronto. A forma mais simples de fazê-lo é monitorando os containeres com [`ctop`](https://github.com/bcicen/ctop) -- quando a mensagem "starting http server..." for impressa pelas instancias da api, você verá um breve intenso uso de CPU e, então, após alguns segundos, quando a utilização de CPU zerar (ou aproximar zero), a aplicação estará pronta para ser testada.
+>
+> TL;DR: espere uns 15s após ver a mensagem "starting http server..." antes de iniciar o teste.
 
 
 ## Testes de contrato
