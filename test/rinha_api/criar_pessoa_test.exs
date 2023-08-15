@@ -2,10 +2,10 @@ defmodule CriarPessoaTest do
   use APICase, async: true
 
   @fixture %{
-    nome: "Rafael Willians",
-    apelido: "rwillians",
-    data_nascimento: "1970-01-01",
-    stack: ["Elixir", "JS", "TS", "PHP", "Ruby"]
+    "nome" => "Rafael Willians",
+    "apelido" => "rwillians",
+    "nascimento" => "1970-01-01",
+    "stack" => ["Elixir", "JS", "TS", "PHP", "Ruby"]
   }
 
   describe "POST /pessoas" do
@@ -14,39 +14,51 @@ defmodule CriarPessoaTest do
 
       assert conn.state == :sent
       assert conn.status == 201
+
+      ##
+      # retorna o header `Location`
       assert [location] = get_resp_header(conn, "location")
       assert "/pessoas/" <> id = location
       assert id !== ""
 
-      # retorna o objeto pessoa criado
-      assert conn.body_params["nome"] == @fixture.nome
-      assert conn.body_params["apelido"] == @fixture.apelido
-      assert conn.body_params["data_nascimento"] == @fixture.data_nascimento
-      assert conn.body_params["stack"] == @fixture.stack
+      ##
+      # o id do header location é igual ao id retornado no corpo da requisição
+      assert conn.body_params["id"] == id
 
+      ##
+      # retorna o objeto pessoa criado
+      assert drop_id(conn.body_params) == @fixture
+
+      ##
       # foi persistido corretamente no banco
       pessoa = Rinha.Repo.get(Pessoa, id)
 
       assert not is_nil pessoa
-      assert pessoa.nome == @fixture.nome
-      assert pessoa.apelido == @fixture.apelido
-      assert pessoa.data_nascimento == Date.from_iso8601!(@fixture.data_nascimento)
-      assert pessoa.stack == @fixture.stack
+      assert not is_nil pessoa.id
+      assert pessoa.nome == @fixture["nome"]
+      assert pessoa.apelido == @fixture["apelido"]
+      assert pessoa.nascimento == Date.from_iso8601!(@fixture["nascimento"])
+      assert pessoa.stack == @fixture["stack"]
     end
 
     test ":: 201 :: quando todos campos são válidos (stack null)" do
-      conn = conn(:post, "/pessoas", %{@fixture | stack: nil}) |> send_req()
+      payload = %{@fixture | "stack" => nil}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 201
-      assert [location] = get_resp_header(conn, "location")
-      assert "/pessoas/" <> id = location
-      assert id !== ""
 
-      pessoa = Rinha.Repo.get(Pessoa, id)
+      ##
+      # retorna `stack` como nulo
+      assert is_nil conn.body_params["stack"]
+
+      ##
+      # `stack`foi persistido como nulo
+      pessoa = Rinha.Repo.get(Pessoa, conn.body_params["id"])
 
       assert not is_nil pessoa
-      assert pessoa.stack == nil
+      assert is_nil pessoa.stack
     end
 
     test ":: 422 :: quando nenhum campo é informado" do
@@ -57,29 +69,37 @@ defmodule CriarPessoaTest do
     end
 
     test ":: 422 :: quando campo `nome` está vazio" do
-      conn = conn(:post, "/pessoas", %{@fixture | nome: ""}) |> send_req()
+      payload = %{@fixture | "nome" => ""}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
     end
 
     test ":: 422 :: quando campo `nome` tem caracteres especiais" do
-      conn = conn(:post, "/pessoas", %{@fixture | nome: "Raf@el Willi@n$"}) |> send_req()
+      payload = %{@fixture | "nome" => "Raf@el Willi@n$"}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
     end
 
     test ":: 422 :: quando campo `nome` excede limite de caracteres" do
-      nome = "asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf asdfasdf"
-      conn = conn(:post, "/pessoas", %{@fixture | nome: nome}) |> send_req()
+      nome = "asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf asdfasdfasdfasdf"
+      payload = %{@fixture | "nome" => nome}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
     end
 
     test ":: 422 :: quando campo `apelido` está vazio" do
-      conn = conn(:post, "/pessoas", %{@fixture | apelido: ""}) |> send_req()
+      payload = %{@fixture | "apelido" => ""}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
@@ -87,7 +107,9 @@ defmodule CriarPessoaTest do
 
     test ":: 422 :: quando campo `apelido` excede limite de caracteres" do
       apelido = "asdfasdfasdfasdfasdfasdfasdfasdfa"
-      conn = conn(:post, "/pessoas", %{@fixture | apelido: apelido}) |> send_req()
+      payload = %{@fixture | "apelido" => apelido}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
@@ -106,21 +128,27 @@ defmodule CriarPessoaTest do
     end
 
     test ":: 422 :: quando campo `dataNascimento` está vazio" do
-      conn = conn(:post, "/pessoas", %{@fixture | data_nascimento: ""}) |> send_req()
+      payload = %{@fixture | "nascimento" => ""}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
     end
 
     test ":: 422 :: quando campo `dataNascimento` term formato invalido" do
-      conn = conn(:post, "/pessoas", %{@fixture | data_nascimento: "01/01/1970"}) |> send_req()
+      payload = %{@fixture | "nascimento" => "01/01/1970"}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422
     end
 
     test ":: 422 :: quando campo `stack` possui elemento que excede limite de caracteres" do
-      conn = conn(:post, "/pessoas", %{@fixture | stack: ["foobarstackzilla"]}) |> send_req()
+      payload = %{@fixture | "stack" => ["foobarstackzilla super hyper mega"]}
+
+      conn = conn(:post, "/pessoas", payload) |> send_req()
 
       assert conn.state == :sent
       assert conn.status == 422

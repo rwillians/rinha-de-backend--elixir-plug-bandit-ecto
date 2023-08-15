@@ -5,26 +5,26 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
     %{
       "nome" => "Rafael Willians",
       "apelido" => "rwillians",
-      "data_nascimento" => "1970-01-01",
+      "nascimento" => "1970-01-01",
       "stack" => ["Elixir", "JS", "TS", "PHP", "Ruby"]
     },
     %{
       "nome" => "João das Neves",
       "apelido" => "jsilvaneves",
-      "data_nascimento" => "1970-01-01",
+      "nascimento" => "1970-01-01",
       "stack" => nil
       #          ^ sabe nada, joão
     },
     %{
       "nome" => "José da Silva",
       "apelido" => "jsilva",
-      "data_nascimento" => "1970-01-01",
+      "nascimento" => "1970-01-01",
       "stack" => ["Python"]
     },
     %{
       "nome" => "Osvaildo Alfredo Machado da Silva Sauro",
       "apelido" => "oamssauro",
-      "data_nascimento" => "1970-01-01",
+      "nascimento" => "1970-01-01",
       "stack" => ["Fortran", "JS"]
     }
   ]
@@ -217,13 +217,4 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
              ]
     end
   end
-
-  #
-  # PRIVATE
-  #
-
-  defp drop_id(acc \\ [], value)
-  defp drop_id(_acc, %{} = map), do: Map.drop(map, ["id"])
-  defp drop_id(acc, [head | tail]), do: [drop_id(head) | acc] |> drop_id(tail)
-  defp drop_id(acc, []), do: :lists.reverse(acc)
 end

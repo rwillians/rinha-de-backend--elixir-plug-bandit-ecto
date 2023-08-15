@@ -43,4 +43,9 @@ defmodule APICase do
         conn
     end
   end
+
+  def drop_id(acc \\ [], value)
+  def drop_id(_acc, %{} = map), do: Map.drop(map, ["id"])
+  def drop_id(acc, [head | tail]), do: [drop_id(head) | acc] |> drop_id(tail)
+  def drop_id(acc, []), do: :lists.reverse(acc)
 end

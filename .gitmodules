@@ -1,0 +1,3 @@
+[submodule ".k6"]
+	path = .k6
+	url = https://github.com/rwillians/rinha-backend-2023Q3-k6

@@ -42,8 +42,9 @@ CREATE TABLE public.pessoas (
     id uuid NOT NULL,
     nome character varying(75) NOT NULL,
     apelido character varying(32) NOT NULL,
-    data_nascimento date NOT NULL,
-    stack character varying(255)[] DEFAULT NULL::character varying[]
+    nascimento date NOT NULL,
+    stack character varying(255)[] DEFAULT NULL::character varying[],
+    pesquisa character varying(255) DEFAULT NULL::character varying
 );
 
 
@@ -81,10 +82,10 @@ CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido
 
 
 --
--- Name: pessoas_nome_apelido_stack_index; Type: INDEX; Schema: public; Owner: -
+-- Name: pessoas_pesquisa_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX pessoas_nome_apelido_stack_index ON public.pessoas USING btree (nome, apelido, stack);
+CREATE INDEX pessoas_pesquisa_index ON public.pessoas USING btree (pesquisa);
 
 
 --

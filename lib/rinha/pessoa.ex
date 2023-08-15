@@ -5,6 +5,7 @@ defmodule Pessoa do
 
   import Ecto.Changeset
   import Ecto.Query
+  import Enum, only: [join: 2]
   import Ex.Ecto.Changeset
   import Rinha.Pessoa.Query, only: [search_score: 5]
 
@@ -14,7 +15,8 @@ defmodule Pessoa do
           nome: String.t(),
           apelido: String.t(),
           nascimento: Date.t(),
-          stack: [String.t(), ...] | nil
+          stack: [String.t(), ...] | nil,
+          pesquisa: String.t()
         }
 
   @primary_key false
@@ -24,7 +26,8 @@ defmodule Pessoa do
     field :nome, :string
     field :apelido, :string
     field :nascimento, :date
-    field :stack, {:array, :string}
+    field :stack, {:array, :string}, default: nil
+    field :pesquisa, :string
   end
 
   @required_error_msg "campo obrigatório"
@@ -50,12 +53,22 @@ defmodule Pessoa do
     |> cast(params, [:nome, :apelido, :nascimento, :stack])
     |> validate_required([:nome, :apelido, :nascimento], message: @required_error_msg)
     |> validate_length(:nome, min: 3, message: @min_char_error_msg)
-    |> validate_length(:nome, max: 75, message: @max_char_error_msg)
+    |> validate_length(:nome, max: 100, message: @max_char_error_msg)
     |> validate_format(:nome, @name_pattern, message: @alphabet_error_msg)
     |> validate_length(:apelido, max: 32, message: @max_char_error_msg)
     |> unique_constraint(:apelido, message: @dup_nick_error_msg)
-    |> validate_each(:stack, validate_length(max: 10, message: @max_char_error_msg))
+    |> validate_each(:stack, validate_length(max: 32, message: @max_char_error_msg))
+    |> then(&put_change(&1, :pesquisa, to_search_term(&1)))
   end
+
+  defp to_search_term(%{valid?: true, changes: changes}) do
+    case changes do
+      %{stack: [_ | _] = stack} = fields -> join([fields.nome, fields.apelido] ++ stack, " ")
+      fields -> join([fields.nome, fields.apelido], " ")
+    end
+  end
+
+  defp to_search_term(_), do: ""
 
   @doc """
   Query builder para o model `Pessoa`.
