@@ -91,7 +91,7 @@ services:
     image: haproxy:2.8.2-alpine
     container_name: rinha-lb
     volumes:
-      - '.data/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
+      - './.data/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
     depends_on:
       - api1
       - api2
