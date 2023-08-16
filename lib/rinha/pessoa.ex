@@ -85,9 +85,10 @@ defmodule Pessoa do
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
   defp filter(query, [{:t, str} | tail]) do
+    term = "%#{str}%"
+
     query
-    |> where([p], search_score(p.nome, p.apelido, p.stack, ^@reasonable_score, ^str) > ^@reasonable_score)
-    |> order_by([p], desc: search_score(p.nome, p.apelido, p.stack, ^@reasonable_score, ^str), asc: p.nome)
+    |> where([p], like(p.pesquisa, ^term))
     |> filter(tail)
   end
 end
