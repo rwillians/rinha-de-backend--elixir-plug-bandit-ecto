@@ -30,6 +30,7 @@ defmodule Rinha.MixProject do
 
   defp deps do
     [
+      {:bigflake, "~> 0.5.0"},
       {:corsica, "~> 2.1.2"},
       {:ecto_sql, "~> 3.10.1"},
       {:etag_plug, "~> 1.0.0"},

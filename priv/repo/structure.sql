@@ -39,12 +39,12 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.pessoas (
-    id uuid NOT NULL,
+    id character varying(32) NOT NULL,
     nome character varying(75) NOT NULL,
     apelido character varying(32) NOT NULL,
     nascimento date NOT NULL,
     stack character varying(255)[] DEFAULT NULL::character varying[],
-    pesquisa character varying(255) DEFAULT NULL::character varying
+    pesquisa text
 );
 
 

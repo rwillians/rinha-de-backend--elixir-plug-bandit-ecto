@@ -7,11 +7,11 @@ defmodule Pessoa do
   import Ecto.Query
   import Enum, only: [join: 2]
   import Ex.Ecto.Changeset
-  import Rinha.Pessoa.Query, only: [search_score: 5]
+  import String, only: [downcase: 1]
 
   @typedoc false
   @type t :: %Pessoa{
-          id: Ecto.UUID.t(),
+          id: SUUID.t(),
           nome: String.t(),
           apelido: String.t(),
           nascimento: Date.t(),
@@ -22,7 +22,7 @@ defmodule Pessoa do
   @primary_key false
   @derive {Jason.Encoder, only: [:id, :nome, :apelido, :nascimento, :stack]}
   schema "pessoas" do
-    field :id, Ecto.UUID, autogenerate: true, primary_key: true
+    field :id, SUUID, autogenerate: true, primary_key: true
     field :nome, :string
     field :apelido, :string
     field :nascimento, :date
@@ -31,6 +31,12 @@ defmodule Pessoa do
   end
 
   @required_error_msg "campo obrigatório"
+
+  ##
+  #
+  #   CHANGESET
+  #
+  ##
 
   @doc """
   Returna um `Ecto.Changeset` com as alterações feitas em um model
@@ -62,13 +68,22 @@ defmodule Pessoa do
   end
 
   defp to_search_term(%{valid?: true, changes: changes}) do
-    case changes do
-      %{stack: [_ | _] = stack} = fields -> join([fields.nome, fields.apelido] ++ stack, " ")
-      fields -> join([fields.nome, fields.apelido], " ")
-    end
+    term =
+      case changes do
+        %{stack: [_ | _] = stack} = fields -> join([fields.nome, fields.apelido] ++ stack, " ")
+        fields -> join([fields.nome, fields.apelido], " ")
+      end
+
+    downcase(term)
   end
 
   defp to_search_term(_), do: ""
+
+  ##
+  #
+  #   QUERIES
+  #
+  ##
 
   @doc """
   Query builder para o model `Pessoa`.
@@ -77,18 +92,13 @@ defmodule Pessoa do
 
   def pessoas_query(filters)
       when is_list(filters),
-      do: filter(__MODULE__, filters)
-
-  @reasonable_score 0.15
+      do: from(pessoa in Pessoa, order_by: [asc: pessoa.id]) |> filter(filters)
 
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
   defp filter(query, [{:t, str} | tail]) do
-    term = "%#{str}%"
-
-    query
-    |> where([p], like(p.pesquisa, ^term))
-    |> filter(tail)
+    term = "%#{downcase(str)}%"
+    where(query, [p], like(p.pesquisa, ^term)) |> filter(tail)
   end
 end
