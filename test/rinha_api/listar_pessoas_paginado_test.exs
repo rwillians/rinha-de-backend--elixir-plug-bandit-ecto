@@ -72,7 +72,14 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
       assert conn.state == :sent
       assert conn.status == 200
 
-      assert drop_id(conn.body_params["resultados"]) == [Enum.at(@fixtures, 1), Enum.at(@fixtures, 2)]
+      assert drop_id(conn.body_params["resultados"]) == [
+               Enum.at(@fixtures, 1),
+               #                  ^ por que tem "jsilva" no apelido
+               Enum.at(@fixtures, 2),
+               #                  ^ por que tem "jsilva" no apelido
+               Enum.at(@fixtures, 3)
+               #                  ^ por que tem silva no nome
+             ]
     end
 
     test ":: 200 :: é possível pesquisar pessoa por skill da stack" do

@@ -7,6 +7,7 @@ defmodule Pessoa do
   import Ecto.Query
   import Enum, only: [join: 2]
   import Ex.Ecto.Changeset
+  import Ex.Ecto.Query, only: [search_score: 2]
   import String, only: [downcase: 1]
 
   @typedoc false
@@ -97,8 +98,12 @@ defmodule Pessoa do
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
-  defp filter(query, [{:t, str} | tail]) do
-    term = "%#{downcase(str)}%"
-    where(query, [p], like(p.pesquisa, ^term)) |> filter(tail)
+  # defp filter(query, [{:t, str} | tail]) do
+  #   term = "%#{downcase(str)}%"
+  #   where(query, [p], like(p.pesquisa, ^term)) |> filter(tail)
+  # end
+
+  defp filter(query, [{:t, term} | tail]) do
+    where(query, [p], search_score(p.pesquisa, ^term) > 0.0833) |> filter(tail)
   end
 end

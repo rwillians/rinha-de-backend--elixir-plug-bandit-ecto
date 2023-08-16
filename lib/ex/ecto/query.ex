@@ -11,6 +11,24 @@ defmodule Ex.Ecto.Query do
 
   alias Ex.Ecto.Query.Page
 
+  @doc """
+  Estabelece uma pontuação para cada pessoa com base em um valor pesquisado.
+  """
+  defmacro search_score(field, term) do
+    quote do
+      fragment(
+        """
+        (1 - (? <-> ?)) + ts_rank(to_tsvector('simple', ?), plainto_tsquery(?))
+        """,
+        unquote(field),
+        unquote(term),
+        unquote(field),
+        unquote(term)
+      )
+    end
+  end
+
+
   @default_max_page_size 50
 
   @doc """
