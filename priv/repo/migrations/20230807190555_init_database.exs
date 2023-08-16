@@ -12,7 +12,7 @@ defmodule Rinha.Repo.Migrations.InitDatabase do
     end
 
     create unique_index(:pessoas, [:apelido])
-    create index(:pessoas, [:pesquisa])
+    create index(:pessoas, ["(to_tsvector('simple', pesquisa))"], using: :gin)
 
     execute """
     CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;

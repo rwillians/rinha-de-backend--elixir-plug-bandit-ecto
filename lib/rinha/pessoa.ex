@@ -31,8 +31,6 @@ defmodule Pessoa do
     field :pesquisa, :string
   end
 
-  @required_error_msg "campo obrigatório"
-
   ##
   #
   #   CHANGESET
@@ -49,6 +47,7 @@ defmodule Pessoa do
   @alphabet_error_msg "apenas letras e espaços são permitidos"
   @min_char_error_msg "deve conter no mínimo %{count} caracteres"
   @max_char_error_msg "deve conter no máximo %{count} caracteres"
+  @required_error_msg "campo obrigatório"
 
   @accents "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇ"
   @name_pattern ~r/^[a-zA-Z#{@accents}\.\s]+$/
@@ -98,12 +97,8 @@ defmodule Pessoa do
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
-  # defp filter(query, [{:t, str} | tail]) do
-  #   term = "%#{downcase(str)}%"
-  #   where(query, [p], like(p.pesquisa, ^term)) |> filter(tail)
-  # end
-
   defp filter(query, [{:t, term} | tail]) do
     where(query, [p], search_score(p.pesquisa, ^term) > 0.0833) |> filter(tail)
+    #                                                   ^ manually tunned
   end
 end

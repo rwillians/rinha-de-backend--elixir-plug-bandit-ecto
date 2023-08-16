@@ -75,17 +75,17 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: pessoas__to_tsvector__simple___pesquisa_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pessoas__to_tsvector__simple___pesquisa_index ON public.pessoas USING gin (to_tsvector('simple'::regconfig, pesquisa));
+
+
+--
 -- Name: pessoas_apelido_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido);
-
-
---
--- Name: pessoas_pesquisa_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX pessoas_pesquisa_index ON public.pessoas USING btree (pesquisa);
 
 
 --

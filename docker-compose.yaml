@@ -16,7 +16,7 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.45'
+          cpus: '0.50'
           memory: 1024M
         reservations:
           cpus: '0.10'
@@ -101,7 +101,7 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.20'
           memory: 128M
         reservations:
           cpus: '0.05'
