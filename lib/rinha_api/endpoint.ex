@@ -14,6 +14,7 @@ defmodule RinhaAPI.Endpoint do
 
   import RinhaAPI.Controller.Pessoas,
     only: [
+      contar_pessoas: 1,
       criar_pessoa: 1,
       listar_pessoas: 1,
       pegar_pessoa: 1
@@ -59,6 +60,7 @@ defmodule RinhaAPI.Endpoint do
   get  "/pessoas", do: listar_pessoas(conn)
   post "/pessoas", do: criar_pessoa(conn)
   get  "/pessoas/:id", do: pegar_pessoa(conn)
+  get  "/contagem-pessoas", do: contar_pessoas(conn)
 
   # endregion
 

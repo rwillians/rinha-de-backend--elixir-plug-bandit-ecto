@@ -74,4 +74,16 @@ defmodule RinhaAPI.Controller.Pessoas do
   end
 
   def pegar_pessoa(conn), do: http_error(:not_found) |> send_resp_json(conn)
+
+  @doc """
+  Retorna a contagem de quantas pessoas existem no banco de dados.
+  """
+  def contar_pessoas(conn) do
+    params = %{pagina: 0, limite: 0}
+    page = paginated(params, &pessoas_query/1)
+
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "#{page.total}")
+  end
 end

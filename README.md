@@ -47,14 +47,20 @@ git clone --recurse-submodules git@github.com:rwillians/rinha-backend--elixir-co
 
 ## Buildando a imagem do projeto (opcional)
 
-Uma imagem OCI já está compilada e está disponível publicamente em `ghcr.io/rwillians/rinha-de-backend--elixir-cowboy-ecto:latest`. No entanto, caso a imagem publicada não seja compativel com a arquitetura da máquina onde pretende rodar a aplicação, você pode facilmente compilar uma nova imagem rodando o seguinte comando:
+Uma imagem OCI já está compilada e está disponível publicamente em `ghcr.io/rwillians/rinha-de-backend--elixir-cowboy-ecto:latest` (vide tags versionadas [aqui](https://github.com/rwillians/rinha-backend--elixir-cowboy-ecto/pkgs/container/rinha-backend--elixir-cowboy-ecto)). No entanto, caso a imagem publicada não seja compativel com a arquitetura da máquina onde pretende rodar a aplicação, você pode facilmente compilar uma nova imagem rodando o seguinte comando:
 
 ```sh
 # À partir do diretório raiz do projeto
-docker build -t ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:latest --target=prod .
+./build
 ```
 
-As demais instruções permanecem igual independente se você utilizará a imagem buildada localmente ou a imagem publicada.
+À partir do momento que você buildar uma imagem local, sem que você faça mais nada, ela será utilizada ao invés de utilizar a que eu buildei e publiquei. Isso pode atrapalhar você utilizar uma versão mais recente publicada, portanto, se certifique de excluir as imagems `ghcr.io/rwillians/rinha-de-backend--elixir-cowboy-ecto` para que você possa utilizar uma versão mais nova publicada.
+
+Você também pode utilizar a variável de ambiente `IMAGE_TAG` para especificar qual versão/tag da imagem publicida você quer utilizar. Por padrão, será utilizado a tag `latest`, mas você pode especificar outra versão da seguinte forma:
+
+```sh
+IMAGE_TAG="0.2.0" ./start
+```
 
 
 ## Rodando a aplicação com Docker Compose
@@ -108,7 +114,6 @@ Confira as instruções no reposório [rwillians/rinha-backend-2023Q3-k6](https:
 ```txt
 $> MIX_ENV=test mix do ecto.drop --quiet, ecto.create --quiet, ecto.load --quiet, test --max-failures=1
 
-
 POST /pessoas :: 201 :: quando todos campos são válidos
 POST /pessoas :: 201 :: quando todos campos são válidos (stack null)
 POST /pessoas :: 422 :: quando nenhum campo é informado
@@ -145,4 +150,6 @@ GET /pessoas?t={termo}&pagina={num}&limite={num} :: 200 :: campo `anterior` most
 GET /pessoas?t={termo}&pagina={num}&limite={num} :: 200 :: campo `proxima` mostrá o número da proxima página (se houver)
 GET /pessoas?t={termo}&pagina={num}&limite={num} :: 200 :: campo `resultados` contém os resultados
 GET /pessoas?t={termo}&pagina=99999&limite={num} :: 200 :: (página não existente) retorna o número da ultima página com conteúdo no campo 'anterior'
+
+GET /contagem-pessoas :: 200 :: retorna quantas pessoas existem no bando de dados
 ```
