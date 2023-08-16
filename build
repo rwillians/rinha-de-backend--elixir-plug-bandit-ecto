@@ -1,0 +1,6 @@
+#! /usr/bin/env sh
+
+docker build \
+  -t ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:latest \
+  --target=prod \
+  .
