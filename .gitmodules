@@ -1,3 +1,7 @@
 [submodule ".k6"]
 	path = .k6
 	url = https://github.com/rwillians/rinha-backend-2023Q3-k6
+[submodule ".gatling"]
+	path = .gatling
+	url = git@github.com:rwillians/rinha-backend-2023Q3-gatling.git
+	branch = main

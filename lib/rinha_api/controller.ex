@@ -37,10 +37,10 @@ defmodule RinhaAPI.Controller do
     |> send_resp(status_code, Jason.encode!(body))
   end
 
-  def send_resp_json({status_code, error}, conn) do
+  def send_resp_json({status_code, body}, conn) do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(status_code, Jason.encode!(error))
+    |> send_resp(status_code, Jason.encode!(body))
   end
 
   @doc """
@@ -102,8 +102,14 @@ defmodule RinhaAPI.Controller do
   # a mensagem não pode ser uma string vazia
   defp to_validation_error({<<_, _::binary>> = msg, details})
        when is_list(details),
-       do: %{message: msg, details: into(details, %{})}
+       do: %{message: msg, details: safe_details(details) |> into(%{})}
 
   defp to_validation_error(<<_, _::binary>> = msg),
     do: %{message: msg, details: %{}}
+
+  defp safe_details(details), do: safe_details(details, [])
+  defp safe_details([{:type, {:array, type}} | tail], acc), do: safe_details(tail, [{:type, to_string(type) <> "[]"} | acc])
+  defp safe_details([{:type, type} | tail], acc), do: safe_details(tail, [{:type, to_string(type)} | acc])
+  defp safe_details([head | tail], acc), do: safe_details(tail, [head | acc])
+  defp safe_details([], acc), do: acc
 end

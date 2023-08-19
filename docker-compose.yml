@@ -3,8 +3,8 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15.3-alpine3.18
-    container_name: rinha-postgres
-    command: '-c shared_buffers=256MB -c max_connections=200'
+    container_name: rwillians-rinha-postgres
+    command: '-c shared_buffers=256MB -c max_connections=84'
     environment:
       - 'POSTGRES_DB=rinha_dev'
       - 'POSTGRES_USER=postgres'
@@ -16,28 +16,19 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.50'
-          memory: 1024M
-        reservations:
-          cpus: '0.10'
-          memory: 128M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 60s
+          cpus: '0.70'
+          memory: 512M
 
   api1:
     image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}
-    container_name: rinha-api-1
+    container_name: rwillians-rinha-api-1
     depends_on:
       - postgres
     environment:
       - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
-      - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=75'
+      - 'POOL_SIZE=40'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
@@ -46,28 +37,19 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.45'
-          memory: 256M
-        reservations:
-          cpus: '0.10'
-          memory: 32M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 60s
+          cpus: '0.3375'
+          memory: 128M
 
   api2:
     image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:${IMAGE_TAG:-latest}
-    container_name: rinha-api-2
+    container_name: rwillians-rinha-api-2
     depends_on:
       - postgres
     environment:
       - 'DATABASE_URL=postgres://postgres:postgres@postgres/rinha_dev'
-      - 'RELEASE_COOKIE=4F022BFB13DB6D12BDB7818F80AC2B6F'
       - 'RELEASE_DISTRIBUTION=sname'
       - 'SERVER_ENABLED=true'
-      - 'POOL_SIZE=75'
+      - 'POOL_SIZE=40'
     entrypoint: [ "sh", "-c" ]
     #                   ↓ Demora alguns segundos para o banco de dados ficar
     #                   ↓ disponível então precisamos esperar um pouco.
@@ -76,38 +58,22 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.40'
-          memory: 256M
-        reservations:
-          cpus: '0.10'
-          memory: 32M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 60s
+          cpus: '0.3375'
+          memory: 128M
 
   load-balancer:
     image: haproxy:2.8.2-alpine
-    container_name: rinha-lb
+    container_name: rwillians-rinha-lb
     volumes:
-      - './.data/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
+      - './haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
     depends_on:
       - api1
       - api2
     ports:
-      - '${PORT:-8080}:8080'
+      - '${PORT:-9999}:8080'
     deploy:
       mode: global
       resources:
         limits:
-          cpus: '0.20'
-          memory: 128M
-        reservations:
-          cpus: '0.05'
-          memory: 8M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 60s
+          cpus: '0.125'
+          memory: 12M

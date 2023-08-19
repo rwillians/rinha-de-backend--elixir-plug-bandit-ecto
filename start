@@ -38,11 +38,10 @@ echo "     espere mais uns ~10s${COLOR_OFF}${DIM} para começar a mandar carga p
 echo "     o consumo de CPU zerar (ou se aproximar de zero -- você pode monitorar"
 echo "     isso utilizando \`ctop\` ou \`docker stats\`) e então dê início ao teste."
 echo "${COLOR_OFF}${BOLD_WHITE}"
-echo ""
 echo "────────────────────────────────────────────────────────────────────────────────"
 echo "${COLOR_OFF}"
-read -n 1 -s -r -p "Precione qualquer tecla para continuar..."
+echo "     ${GREEN}[Enter]${COLOR_OFF}${DIM} para continuar │ ${RED}[CTRL+C]${COLOR_OFF}${DIM} para sair               "
+read -p "" input
 
 docker compose down --volumes && \
-  docker compose pull && \
   docker compose up

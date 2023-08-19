@@ -1,0 +1,45 @@
+#! /usr/bin/env sh
+
+##
+# BUILD AND PUSH OCI IMAGE TO REPOSITORY
+# ======================================
+# Example: `./build-push 0.2.0`
+##
+
+REVISION=$(git log -1 --pretty=format:"%H")
+
+if [ -z ${REVISION} ]; then
+  echo "Comita essa joça ai"
+  exit 1;
+fi
+
+VERSION=${1:-}
+
+if [ -z ${VERSION} ]; then
+  echo "Cê esqueceu de passar a versão como argumento"
+  exit 1;
+fi
+
+GITHUB_REPO="rwillians/rinha-backend--elixir-cowboy-ecto"
+REGISTRY_IMAGE="ghcr.io/${GITHUB_REPO}"
+
+LABELS+=",org.opencontainers.image.url=\"https://github.com/${GITHUB_REPO}\""
+LABELS+=",org.opencontainers.image.source=\"https://github.com/${GITHUB_REPO}/blob/${REVISION}/Dockerfile\""
+LABELS+=",org.opencontainers.image.version=\"${VERSION}\""
+LABELS+=",org.opencontainers.image.revision=\"${REVISION}\""
+LABELS+=",org.opencontainers.image.licenses=\"MIT\""
+
+docker buildx create \
+  --name pedantic_lederberg \
+  #      ^ caso já exista um builder com esse nome vai imprimir um error mas é
+  #        safe ignorar
+  --platform linux/amd64,linux/arm64
+
+docker buildx build \
+  -t "${REGISTRY_IMAGE}:latest" \
+  -t "${REGISTRY_IMAGE}:${VERSION}" \
+  --target prod \
+  --label ${LABELS} \
+  --builder pedantic_lederberg \
+  --platform linux/amd64,linux/arm64 \
+  .

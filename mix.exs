@@ -35,7 +35,6 @@ defmodule Rinha.MixProject do
       {:ecto_sql, "~> 3.10.1"},
       {:etag_plug, "~> 1.0.0"},
       {:jason, "~> 1.4.1"},
-      {:libcluster, "~> 3.3"},
       {:plug, "~> 1.14.2"},
       {:plug_cowboy, "~> 2.6.1"},
       {:postgrex, ">= 0.17.2"},

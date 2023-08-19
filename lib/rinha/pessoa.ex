@@ -7,7 +7,7 @@ defmodule Pessoa do
   import Ecto.Query
   import Enum, only: [join: 2]
   import Ex.Ecto.Changeset
-  import Ex.Ecto.Query, only: [search_score: 2]
+  # import Ex.Ecto.Query, only: [search_score: 2]
   import String, only: [downcase: 1]
 
   @typedoc false
@@ -55,29 +55,29 @@ defmodule Pessoa do
   #                                      incluindo títulos como "Dr. ..."
 
   def changeset(pessoa, params \\ %{}) do
-    pessoa
-    |> cast(params, [:nome, :apelido, :nascimento, :stack])
-    |> validate_required([:nome, :apelido, :nascimento], message: @required_error_msg)
-    |> validate_length(:nome, min: 3, message: @min_char_error_msg)
-    |> validate_length(:nome, max: 100, message: @max_char_error_msg)
-    |> validate_format(:nome, @name_pattern, message: @alphabet_error_msg)
-    |> validate_length(:apelido, max: 32, message: @max_char_error_msg)
-    |> unique_constraint(:apelido, message: @dup_nick_error_msg)
-    |> validate_each(:stack, validate_length(max: 32, message: @max_char_error_msg))
-    |> then(&put_change(&1, :pesquisa, to_search_term(&1)))
+    changeset =
+      pessoa
+      |> cast(params, [:nome, :apelido, :nascimento, :stack])
+      |> validate_required([:nome, :apelido, :nascimento], message: @required_error_msg)
+      |> validate_length(:nome, min: 3, message: @min_char_error_msg)
+      |> validate_length(:nome, max: 100, message: @max_char_error_msg)
+      |> validate_format(:nome, @name_pattern, message: @alphabet_error_msg)
+      |> validate_length(:apelido, max: 32, message: @max_char_error_msg)
+      |> unique_constraint(:apelido, message: @dup_nick_error_msg)
+      |> validate_array(:stack, each_length(max: 32, message: @max_char_error_msg))
+
+    case changeset.valid? do
+      true ->
+        term = apply_changes(changeset) |> to_search_term()
+        put_change(changeset, :pesquisa, term)
+
+      false ->
+        changeset
+    end
   end
 
-  defp to_search_term(%{valid?: true, changes: changes}) do
-    term =
-      case changes do
-        %{stack: [_ | _] = stack} = fields -> join([fields.nome, fields.apelido] ++ stack, " ")
-        fields -> join([fields.nome, fields.apelido], " ")
-      end
-
-    downcase(term)
-  end
-
-  defp to_search_term(_), do: ""
+  defp to_search_term(%{stack: [_ | _] = stack} = p), do: join([p.nome, p.apelido] ++ stack, " ") |> downcase()
+  defp to_search_term(p), do: join([p.nome, p.apelido], " ") |> downcase()
 
   ##
   #
@@ -97,8 +97,17 @@ defmodule Pessoa do
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
+  # defp filter(query, [{:t, term} | tail]) do
+  #   where(query, [p], search_score(p.pesquisa, ^term) > 0.0833) |> filter(tail)
+  #   #                                                   ^ manually tunned
+  # end
+
   defp filter(query, [{:t, term} | tail]) do
-    where(query, [p], search_score(p.pesquisa, ^term) > 0.0833) |> filter(tail)
-    #                                                   ^ manually tunned
+    term = downcase(term)
+    term = "%#{term}%"
+
+    query
+    |> where([p], like(p.pesquisa, ^term))
+    |> filter(tail)
   end
 end

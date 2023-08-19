@@ -16,20 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -40,7 +26,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.pessoas (
     id character varying(32) NOT NULL,
-    nome character varying(75) NOT NULL,
+    nome character varying(100) NOT NULL,
     apelido character varying(32) NOT NULL,
     nascimento date NOT NULL,
     stack character varying(255)[] DEFAULT NULL::character varying[],
@@ -75,17 +61,17 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: pessoas__to_tsvector__simple___pesquisa_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX pessoas__to_tsvector__simple___pesquisa_index ON public.pessoas USING gin (to_tsvector('simple'::regconfig, pesquisa));
-
-
---
 -- Name: pessoas_apelido_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido);
+
+
+--
+-- Name: pessoas_pesquisa_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pessoas_pesquisa_index ON public.pessoas USING btree (pesquisa);
 
 
 --

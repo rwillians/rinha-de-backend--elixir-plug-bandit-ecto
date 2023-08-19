@@ -48,12 +48,6 @@ config :rinha, ecto_repos: [Rinha.Repo]
 config :rinha, RinhaAPI.Endpoint, run_server?: false
 
 #
-#   LIBCLUSTER
-#
-
-config :libcluster, debug: true
-
-#
 #   CONFIGURAÇÕES ESPECIFICAS POR AMBIENTE
 #   --------------------------------------
 #

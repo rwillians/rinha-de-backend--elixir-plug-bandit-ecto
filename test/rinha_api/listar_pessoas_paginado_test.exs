@@ -77,7 +77,7 @@ defmodule RinhaApi.ListarPessoasPaginadoTest do
                #                  ^ por que tem "jsilva" no apelido
                Enum.at(@fixtures, 2),
                #                  ^ por que tem "jsilva" no apelido
-               Enum.at(@fixtures, 3)
+              #  Enum.at(@fixtures, 3)
                #                  ^ por que tem silva no nome
              ]
     end

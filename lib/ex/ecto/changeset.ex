@@ -17,33 +17,37 @@ defmodule Ex.Ecto.Changeset do
     ```elixir
     changeset
     |> cast(params, [:stack])
-    |> validate_each(:stack, validate_length(max: 32, message: "deve conter..."))
+    |> validate_array(:stack, each_length(max: 32, message: "deve conter..."))
     ```
 
   """
-  def validate_each(changeset, field, validator),
-    do: validate_change(changeset, field, &validate_each({&1, &2}, validator))
+  def validate_array(changeset, field, validator),
+    do: validate_change(changeset, field, &validate_array({&1, &2}, validator))
 
-  defp validate_each({_field, [] = _values}, _validator), do: []
-
-  defp validate_each({field, [_ | _] = values}, validator) do
+  defp validate_array({field, [_ | _] = values}, validator) do
     values
     |> flat_map(validator)
     |> map(fn {value, error} -> {field, {error, value: value}} end)
   end
 
+  defp validate_array({_field, [] = _values}, _validator), do: []
+  defp validate_array({_, nil}, _), do: []
+
+  defp validate_array({field, _}, _),
+    do: [{field, "Campo `#{field}` deve conter um array ou ser nullo"}]
+
   @doc """
-  Destinado a ser utilizado juntamente com `validate_each/3`, valida o tamanho
+  Destinado a ser utilizado juntamente com `validate_array/3`, valida o tamanho
   de strings continas em um parametro do tipo array em um `Ecto.Changeset`.
 
   ## Relacionado
 
-  - Veja `Ex.Ecto.Changeset.validate_each/3`.
+  - Veja `Ex.Ecto.Changeset.validate_array/3`.
 
   """
-  def validate_length([{:max, _} | _] = opts), do: &validate_length(&1, opts)
+  def each_length([{:max, _} | _] = opts), do: &each_length(&1, opts)
 
-  defp validate_length(value, [{:max, max} | opts]) do
+  defp each_length(value, [{:max, max} | opts]) do
     message =
       case get(opts, :message) do
         nil -> "expected a string with max %{count} chars"

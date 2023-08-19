@@ -18,11 +18,21 @@ defmodule SUUID do
   """
   @spec generate() :: t
   def generate do
-    {:ok, id} = mint()
+    {:ok, id} = mint() |> with_retry(3)
 
     to_string(id)
     |> pad_leading(32, "0")
   end
+
+  defp with_retry({:ok, value}, _), do: {:ok, value}
+  defp with_retry({:error, :time_moved_backwards} = result, 0), do: result
+
+  defp with_retry({:error, :time_moved_backwards}, n) do
+    Process.sleep(5)
+    mint() |> with_retry(n - 1)
+  end
+
+  defp with_retry({:error, _} = result, _), do: result
 
   @doc false
   @impl Ecto.Type
