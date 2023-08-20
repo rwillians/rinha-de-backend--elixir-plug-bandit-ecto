@@ -12,15 +12,6 @@ defmodule Rinha.Repo.Migrations.InitDatabase do
     end
 
     create unique_index(:pessoas, [:apelido])
-    create index(:pessoas, [:pesquisa])
-    # create index(:pessoas, ["(to_tsvector('simple', pesquisa))"], using: :gin)
-
-    # execute """
-    # CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-    # """
-
-    # execute """
-    # COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-    # """
+    create index(:pessoas, ["(pesquisa gin_trgm_ops)"], using: :gin)
   end
 end
