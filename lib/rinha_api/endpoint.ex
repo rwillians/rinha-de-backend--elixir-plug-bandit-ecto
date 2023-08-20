@@ -20,23 +20,23 @@ defmodule RinhaAPI.Endpoint do
       pegar_pessoa: 1
     ]
 
-  plug Plug.RequestId, http_header: "x-request-id"
-  plug Plug.Logger
-  plug Plug.Head
+  # plug Plug.RequestId, http_header: "x-request-id"
+  # plug Plug.Logger
+  # plug Plug.Head
 
-  plug Corsica,
-    origins: "*",
-    allow_methods: :all,
-    allow_headers: :all,
-    allow_credentials: true,
-    passthrough_non_cors_requests: true,
-    expose_headers: ["x-request-id"],
-    max_age: 600
+  # plug Corsica,
+  #   origins: "*",
+  #   allow_methods: :all,
+  #   allow_headers: :all,
+  #   allow_credentials: true,
+  #   passthrough_non_cors_requests: true,
+  #   expose_headers: ["x-request-id"],
+  #   max_age: 600
 
-  plug ETag.Plug,
-    generator: ETag.Generator.SHA1Base64,
-    methods: ["GET", "HEAD"],
-    status_codes: [200, 201, 304]
+  # plug ETag.Plug,
+  #   generator: ETag.Generator.SHA1Base64,
+  #   methods: ["GET", "HEAD"],
+  #   status_codes: [200, 201, 304]
 
   plug Plug.Static,
     at: "/",
@@ -57,9 +57,9 @@ defmodule RinhaAPI.Endpoint do
 
   # region: rotas da aplicação
 
-  get  "/pessoas", do: listar_pessoas(conn)
   post "/pessoas", do: criar_pessoa(conn)
   get  "/pessoas/:id", do: pegar_pessoa(conn)
+  get  "/pessoas", do: listar_pessoas(conn)
   get  "/contagem-pessoas", do: contar_pessoas(conn)
 
   # endregion

@@ -3,19 +3,21 @@ defmodule RinhaAPI.Controller.Pessoas do
 
   use RinhaAPI.Controller
 
+  import Enum, only: [to_list: 1]
   import Ex.Ecto.Query, only: [paginated: 2]
-  import Ex.Map, only: [atomize_keys: 1]
-  import Map, only: [get: 2, take: 2]
-  import Pessoa, only: [pessoas_query: 1]
-  import Rinha.Repo, only: [one: 1]
+  import Keyword, only: [get: 2]
+  import Map, only: [take: 2]
+  import Pessoa, only: [changeset: 2, pessoas_query: 1]
+  import Rinha.Repo, only: [insert: 1, one: 1]
+  import String, only: [to_atom: 1]
 
   @doc """
   Endpoint para criação de uma nova pessoa :eyes:
   """
-  def criar_pessoa(%Plug.Conn{} = conn) do
-    changeset = Pessoa.changeset(%Pessoa{}, conn.body_params)
+  def criar_pessoa(conn) do
+    changeset = changeset(%Pessoa{}, conn.body_params)
 
-    case Rinha.Repo.insert(changeset) do
+    case insert(changeset) do
       {:ok, pessoa} ->
         conn
         |> put_resp_header("location", "/pessoas/#{pessoa.id}")
@@ -36,11 +38,11 @@ defmodule RinhaAPI.Controller.Pessoas do
 
   """
   @missing_t_error_detials %{fields: %{t: "faltou o query parameter `t` ai"}}
-  def listar_pessoas(%Plug.Conn{} = conn) do
+  def listar_pessoas(conn) do
     params =
       conn.query_params
       |> take(["pagina", "limite", "t"])
-      |> atomize_keys()
+      |> to_keyword_list()
 
     case get(params, :t) do
       # ↓  string e deve conter pelo menos 1 caractere
@@ -79,11 +81,18 @@ defmodule RinhaAPI.Controller.Pessoas do
   Retorna a contagem de quantas pessoas existem no banco de dados.
   """
   def contar_pessoas(conn) do
-    params = %{pagina: 0, limite: 0}
-    page = paginated(params, &pessoas_query/1)
+    page = paginated([pagina: 0, limite: 0], &pessoas_query/1)
 
     conn
     |> put_resp_content_type("text/plain")
     |> send_resp(200, "#{page.total}")
   end
+
+  #
+  # PRIVATE
+  #
+
+  defp to_keyword_list(%{} = map), do: to_keyword_list(to_list(map), [])
+  defp to_keyword_list([{k, v} | tail], acc), do: to_keyword_list(tail, [{to_atom(k), v} | acc])
+  defp to_keyword_list([], acc), do: acc
 end

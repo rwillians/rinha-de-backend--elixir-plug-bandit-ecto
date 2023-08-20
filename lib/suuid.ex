@@ -40,20 +40,17 @@ defmodule SUUID do
 
   @doc false
   @impl Ecto.Type
-  def cast(<<_::256>> = value), do: {:ok, value}
-  def cast(_), do: :error
+  def cast(value), do: {:ok, value}
 
   @doc false
   @impl Ecto.Type
-  def dump(<<_::256>> = value), do: {:ok, value}
-  def dump(_), do: :error
+  def dump(value), do: {:ok, value}
 
   @doc false
   @impl Ecto.Type
-  def load(<<_::256>> = value), do: {:ok, value}
-  def load(_), do: :error
+  def load(value), do: {:ok, value}
 
   @doc false
   @impl Ecto.Type
-  defdelegate autogenerate, to: __MODULE__, as: :generate
+  def autogenerate, do: generate()
 end

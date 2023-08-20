@@ -4,7 +4,6 @@ defmodule Ex.Ecto.Query do
   """
 
   import Ecto.Query
-  import Enum, only: [to_list: 1]
   import Keyword, only: [fetch!: 2, put_new: 3, split: 2]
   import Rinha.Repo, only: [all: 1, one: 1]
   import String, only: [to_integer: 2]
@@ -42,12 +41,11 @@ defmodule Ex.Ecto.Query do
 
   """
   @spec paginated(
-          filters :: keyword | map,
+          filters :: keyword,
           query_builder :: (keyword -> Ecto.Queryable.t())
         ) :: Page.t()
 
-  def paginated(filters, query_builder)
-      when is_list(filters) and is_function(query_builder, 1) do
+  def paginated(filters, query_builder) do
     {pagination_control, filters} =
       filters
       |> put_new(:pagina, 0)
@@ -101,9 +99,6 @@ defmodule Ex.Ecto.Query do
         }
     end
   end
-
-  def paginated(%{} = filters, query_builder),
-    do: to_list(filters) |> paginated(query_builder)
 
   #
   # PRIVATE

@@ -69,7 +69,7 @@ defmodule RinhaAPI.Controller do
      }}
   end
 
-  def http_error(:validation_error, %Ecto.Changeset{} = changeset) do
+  def http_error(:validation_error, changeset) do
     errors_by_field =
       changeset.errors
       |> group_by(fn {field, _value} -> field end,

@@ -16,6 +16,20 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -68,14 +82,15 @@ CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido
 
 
 --
--- Name: pessoas_pesquisa_index; Type: INDEX; Schema: public; Owner: -
+-- Name: pessoas_pesquisa_gin_trgm_ops_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX pessoas_pesquisa_index ON public.pessoas USING btree (pesquisa);
+CREATE INDEX pessoas_pesquisa_gin_trgm_ops_index ON public.pessoas USING gin (pesquisa public.gin_trgm_ops);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO public."schema_migrations" (version) VALUES (20230807190555);
+INSERT INTO public."schema_migrations" (version) VALUES (20230820110500);
+INSERT INTO public."schema_migrations" (version) VALUES (20230820110501);

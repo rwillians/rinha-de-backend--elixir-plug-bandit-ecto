@@ -12,6 +12,6 @@ defmodule Rinha.Repo.Migrations.InitDatabase do
     end
 
     create unique_index(:pessoas, [:apelido])
-    create index(:pessoas, ["(pesquisa gin_trgm_ops)"], using: :gin)
+    create index(:pessoas, ["pesquisa gin_trgm_ops"], using: :gin)
   end
 end

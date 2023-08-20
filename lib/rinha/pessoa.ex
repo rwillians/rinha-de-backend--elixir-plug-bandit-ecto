@@ -7,7 +7,6 @@ defmodule Pessoa do
   import Ecto.Query
   import Enum, only: [join: 2]
   import Ex.Ecto.Changeset
-  # import Ex.Ecto.Query, only: [search_score: 2]
   import String, only: [downcase: 1]
 
   @typedoc false
@@ -68,7 +67,11 @@ defmodule Pessoa do
 
     case changeset.valid? do
       true ->
-        term = apply_changes(changeset) |> to_search_term()
+        term =
+          apply_changes(changeset)
+          |> to_search_term()
+          |> downcase()
+
         put_change(changeset, :pesquisa, term)
 
       false ->
@@ -76,8 +79,8 @@ defmodule Pessoa do
     end
   end
 
-  defp to_search_term(%{stack: [_ | _] = stack} = p), do: join([p.nome, p.apelido] ++ stack, " ") |> downcase()
-  defp to_search_term(p), do: join([p.nome, p.apelido], " ") |> downcase()
+  defp to_search_term(%{stack: [_ | _] = stack} = p), do: join([p.nome, p.apelido] ++ stack, " ")
+  defp to_search_term(p), do: join([p.nome, p.apelido], " ")
 
   ##
   #
@@ -97,17 +100,11 @@ defmodule Pessoa do
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
-  # defp filter(query, [{:t, term} | tail]) do
-  #   where(query, [p], search_score(p.pesquisa, ^term) > 0.0833) |> filter(tail)
-  #   #                                                   ^ manually tunned
-  # end
-
   defp filter(query, [{:t, term} | tail]) do
     term = downcase(term)
-    term = "%#{term}%"
 
     query
-    |> where([p], like(p.pesquisa, ^term))
+    |> where([p], like(p.pesquisa, ^"%#{term}%"))
     |> filter(tail)
   end
 end
