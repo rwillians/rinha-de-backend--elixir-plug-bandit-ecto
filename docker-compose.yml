@@ -16,11 +16,11 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.70'
+          cpus: '0.80'
           memory: 896M
 
   api1:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.2-arm64
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3-arm64
     container_name: rwillians-rinha-api-1
     depends_on:
       - postgres
@@ -37,11 +37,11 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.3375'
+          cpus: '0.2625'
           memory: 128M
 
   api2:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.2-arm64
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3-arm64
     container_name: rwillians-rinha-api-2
     depends_on:
       - postgres
@@ -58,7 +58,7 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.3375'
+          cpus: '0.2625'
           memory: 128M
 
   load-balancer:
@@ -75,5 +75,5 @@ services:
       mode: global
       resources:
         limits:
-          cpus: '0.125'
+          cpus: '0.175'
           memory: 12M

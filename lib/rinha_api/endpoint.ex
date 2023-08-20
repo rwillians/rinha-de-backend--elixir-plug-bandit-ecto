@@ -114,14 +114,8 @@ defmodule RinhaAPI.Endpoint do
     port = Keyword.fetch!(config, :port)
     run_server? = Keyword.fetch!(config, :run_server?)
 
-    opts = [
-      plug: RinhaAPI.Endpoint,
-      scheme: :http,
-      options: [port: port]
-    ]
-
     case run_server? do
-      true -> [Plug.Cowboy.child_spec(opts)]
+      true -> [{Bandit, [plug: RinhaAPI.Endpoint, scheme: :http, port: port]}]
       false -> []
     end
   end
