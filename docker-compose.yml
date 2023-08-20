@@ -62,10 +62,10 @@ services:
           memory: 128M
 
   load-balancer:
-    image: haproxy:2.8.2-alpine
-    container_name: rwillians-rinha-lb
+    image: nginx:1.25.1-alpine3.17-slim
+    container_name: rwillians-ngnix
     volumes:
-      - './haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
+      - './nginx.conf:/etc/nginx/nginx.conf:ro'
     depends_on:
       - api1
       - api2
