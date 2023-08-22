@@ -20,7 +20,7 @@ services:
           memory: 896M
 
   api1:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3-arm64
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3
     container_name: rwillians-rinha-api-1
     depends_on:
       - postgres
@@ -41,7 +41,7 @@ services:
           memory: 128M
 
   api2:
-    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3-arm64
+    image: ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3
     container_name: rwillians-rinha-api-2
     depends_on:
       - postgres
