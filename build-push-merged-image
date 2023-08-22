@@ -1,0 +1,7 @@
+#! /usr/bin/env sh
+
+docker buildx imagetools create \
+  -t ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:latest \
+  -t ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3 \
+  ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3-linux-amd64 \
+  ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3-linux-amd64

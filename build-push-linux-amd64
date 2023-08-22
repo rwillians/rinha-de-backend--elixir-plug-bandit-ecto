@@ -1,0 +1,8 @@
+#! /usr/bin/env sh
+
+docker buildx build \
+  -t ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3-linux-amd64 \
+  --platform linux/amd64 \
+  --label "org.opencontainers.image.source=http://github.com/rwillians/rinha-de-backend--elixir-plug-bandit-ecto" \
+  --push \
+  .

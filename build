@@ -1,6 +1,0 @@
-#! /usr/bin/env sh
-
-docker build \
-  -t ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:latest \
-  -t ghcr.io/rwillians/rinha-backend--elixir-cowboy-ecto:0.2.3 \
-  .
