@@ -59,9 +59,9 @@ defmodule RinhaAPI.Controller.Pessoas do
   @doc """
   Pega uma pessoa 👀 dado seu id como parametro de URL.
   """
-  def pegar_pessoa(%{params: %{"id" => <<_::256>> = id}} = conn) do
+  def pegar_pessoa(%{params: %{"id" => <<_::288>> = id}} = conn) do
     #                                       ^ se não tiver o tamanho esperado
-    #                                         de um id (256 bytes, 32 hex chars),
+    #                                         de um id (288 bytes, 36 chars),
     #                                         então ignora a request e mete um
     #                                         404.
 

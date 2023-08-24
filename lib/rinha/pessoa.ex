@@ -97,6 +97,12 @@ defmodule Pessoa do
       when is_list(filters),
       do: from(pessoa in Pessoa, order_by: [asc: pessoa.id]) |> filter(filters)
 
+  defmacrop full_text_search(field, value) do
+    quote do
+      fragment("to_tsvector('simple'::regconfig, ?) @@ plainto_tsquery(?)", unquote(field), unquote(value))
+    end
+  end
+
   defp filter(query, []), do: query
   defp filter(query, [{:id, id} | tail]), do: where(query, [p], p.id == ^id) |> filter(tail)
 
@@ -104,7 +110,7 @@ defmodule Pessoa do
     term = downcase(term)
 
     query
-    |> where([p], like(p.pesquisa, ^"%#{term}%"))
+    |> where([p], full_text_search(p.pesquisa, ^term))
     |> filter(tail)
   end
 end

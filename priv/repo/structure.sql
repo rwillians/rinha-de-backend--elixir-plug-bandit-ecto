@@ -82,10 +82,10 @@ CREATE UNIQUE INDEX pessoas_apelido_index ON public.pessoas USING btree (apelido
 
 
 --
--- Name: pessoas_pesquisa_gin_trgm_ops_index; Type: INDEX; Schema: public; Owner: -
+-- Name: pessoas_to_tsvector__simple___pesquisa_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX pessoas_pesquisa_gin_trgm_ops_index ON public.pessoas USING gin (pesquisa public.gin_trgm_ops);
+CREATE INDEX pessoas_to_tsvector__simple___pesquisa_index ON public.pessoas USING gin (to_tsvector('simple'::regconfig, pesquisa));
 
 
 --
