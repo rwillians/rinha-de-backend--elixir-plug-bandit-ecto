@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.3
--- Dumped by pg_dump version 15.3
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -39,7 +39,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.pessoas (
-    id character varying(32) NOT NULL,
+    id uuid NOT NULL,
     nome character varying(100) NOT NULL,
     apelido character varying(32) NOT NULL,
     nascimento date NOT NULL,

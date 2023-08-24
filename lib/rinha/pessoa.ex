@@ -11,7 +11,7 @@ defmodule Pessoa do
 
   @typedoc false
   @type t :: %Pessoa{
-          id: SUUID.t(),
+          id: Ecto.UUID.t(),
           nome: String.t(),
           apelido: String.t(),
           nascimento: Date.t(),
@@ -22,7 +22,7 @@ defmodule Pessoa do
   @primary_key false
   @derive {Jason.Encoder, only: [:id, :nome, :apelido, :nascimento, :stack]}
   schema "pessoas" do
-    field :id, SUUID, autogenerate: true, primary_key: true
+    field :id, Ecto.UUID, autogenerate: true, primary_key: true
     field :nome, :string
     field :apelido, :string
     field :nascimento, :date

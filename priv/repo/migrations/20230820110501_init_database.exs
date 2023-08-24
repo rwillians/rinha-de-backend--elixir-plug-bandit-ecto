@@ -3,7 +3,7 @@ defmodule Rinha.Repo.Migrations.InitDatabase do
 
   def change do
     create table(:pessoas, primary_key: false) do
-      add :id, :string, size: 32, primary_key: true
+      add :id, :uuid, primary_key: true
       add :nome, :string, size: 100, null: false
       add :apelido, :string, size: 32, null: false
       add :nascimento, :date, null: false
