@@ -1,9 +1,46 @@
 #! /usr/bin/env sh
 
-docker build \
-  -t ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.4-linux-arm64 \
-  --platform linux/arm64/v8 \
-  --label "org.opencontainers.image.source=http://github.com/rwillians/rinha-de-backend--elixir-plug-bandit-ecto" \
-  .
+#
+# Rode em uma máquina arm64v8 (por exemplo apple m1 / m2)
+#
 
-docker push ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.4-linux-arm64
+NEGRITO=''
+ESMAECIDO=''
+RESET=''
+VERMELHO_NEGRITO=''
+
+if [ -t 1 ]; then
+  NEGRITO='\033[1m'
+  ESMAECIDO='\033[0;2m'
+  RESET='\033[0m'
+  VERMELHO_NEGRITO='\033[1;31m'
+fi
+
+VERSION=${1}
+
+if [ -z "${VERSION}" ]; then
+  echo ""
+  echo "${VERMELHO_NEGRITO}Faltou passar a versão da imagem como argumento${RESET}"
+  echo ""
+  echo "${ESMAECIDO}É para usar assim oh:${RESET}"
+  echo ""
+  echo "    ${ESMAECIDO}./build-push-linux-amd64${RESET} ${NEGRITO}0.2.5${NEGRITO}"
+  echo ""
+
+  exit 1
+fi
+
+docker --context=default buildx build \
+  -t "ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:${VERSION}-arm64v8" \
+  --label "org.opencontainers.image.source=http://github.com/rwillians/rinha-de-backend--elixir-plug-bandit-ecto" \
+  --builder default \
+  --platform linux/arm64/v8 \
+  --push .
+
+# opcional: para que a imagem rode em dispositivos como raspberry pi
+docker --context=default buildx build \
+  -t "ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:${VERSION}-arm64v7" \
+  --label "org.opencontainers.image.source=http://github.com/rwillians/rinha-de-backend--elixir-plug-bandit-ecto" \
+  --builder default \
+  --platform linux/arm64/v7 \
+  --push .

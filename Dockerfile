@@ -8,7 +8,7 @@ RUN apk add --no-cache git ncurses libstdc++ libgcc && \
     mix local.rebar --force
 
 COPY mix.exs mix.lock ./
-RUN mix deps.get
+RUN mix deps.get --no-archives-check --only=prod
 RUN mix deps.compile
 
 COPY lib/ lib/
