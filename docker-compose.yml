@@ -20,7 +20,7 @@ services:
           memory: 896M
 
   api1:
-    image: ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3
+    image: ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.6
     container_name: rwillians-rinha-api-1
     depends_on:
       - postgres
@@ -41,7 +41,7 @@ services:
           memory: 128M
 
   api2:
-    image: ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.3
+    image: ghcr.io/rwillians/rinha-de-backend--elixir-plug-bandit-ecto:0.2.6
     container_name: rwillians-rinha-api-2
     depends_on:
       - postgres
